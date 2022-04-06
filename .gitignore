@@ -1,1 +1,3 @@
 /node_modules
+/db/index.js
+/lib/sequelize.js
