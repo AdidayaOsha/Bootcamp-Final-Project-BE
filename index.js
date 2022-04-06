@@ -26,5 +26,6 @@ app.get("/", (req, res) => {
 app.use("/admin", adminProductRouter);
 app.use("/products", productRouter);
 app.use("/carts", cartRouter);
+app.use("/images", express.static("./images"));
 
 app.listen(PORT, () => console.log("SERVER RUNNING IN PORT:", PORT));

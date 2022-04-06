@@ -32,7 +32,8 @@ module.exports = {
     Products.sync({ alter: true });
     try {
       let data = {
-        product_image: req.body.filepath,
+        //use file to upload only a single image, not files.
+        product_image: req.file.path,
         name: req.body.name,
         description: req.body.description,
         price: req.body.price,
