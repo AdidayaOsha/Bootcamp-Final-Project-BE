@@ -1,16 +1,18 @@
 const sequelize = require("../lib/sequelize");
 const { DataTypes } = require("sequelize");
-const Product_Category = require("./Product_Category");
+const Product_Categories = require("./Product_Categories");
 
 const Products = sequelize.define(
   "products",
   {
     product_image: {
       type: DataTypes.STRING,
+      defaultValue: "a path to the image",
       allowNull: true,
     },
     name: {
       type: DataTypes.STRING,
+      defaultValue: "example of the File Name",
       allowNull: false,
     },
     description: {
@@ -26,8 +28,14 @@ const Products = sequelize.define(
         },
       },
     },
+    id_category: {
+      type: DataTypes.INTEGER,
+      defaultValue: 1,
+      allowNull: false,
+    },
     is_deleted: {
       type: DataTypes.BOOLEAN,
+      defaultValue: false,
       allowNull: true,
     },
   },
@@ -38,5 +46,5 @@ const Products = sequelize.define(
 
 module.exports = Products;
 
-Products.hasOne(Product_Category);
-Product_Category.belongsTo(Products);
+Products.hasOne(Product_Categories);
+Product_Categories.belongsTo(Products);

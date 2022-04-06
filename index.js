@@ -1,7 +1,7 @@
 const express = require("express");
 const cors = require("cors");
 const sequelize = require("../back-end/lib/sequelize");
-const { adminRouter } = require("./routers");
+const { adminProductRouter, productRouter, cartRouter } = require("./routers");
 
 const app = express();
 app.use(cors());
@@ -23,6 +23,8 @@ app.get("/", (req, res) => {
   res.status(200).send("<h1>Welcome to EMMERCE PROJECT</h1>");
 });
 
-app.use("/admin", adminRouter);
+app.use("/admin", adminProductRouter);
+app.use("/products", productRouter);
+app.use("/carts", cartRouter);
 
 app.listen(PORT, () => console.log("SERVER RUNNING IN PORT:", PORT));

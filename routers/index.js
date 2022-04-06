@@ -1,5 +1,9 @@
-const adminRouter = require("./adminRouter");
+const adminProductRouter = require("./adminProductRouter");
+const productRouter = require("./productRouter");
+const cartRouter = require("./cartRouter");
 
 module.exports = {
-  adminRouter,
+  adminProductRouter,
+  productRouter,
+  cartRouter,
 };
