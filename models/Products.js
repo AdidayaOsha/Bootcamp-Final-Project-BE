@@ -28,11 +28,6 @@ const Products = sequelize.define(
         },
       },
     },
-    id_category: {
-      type: DataTypes.INTEGER,
-      defaultValue: 1,
-      allowNull: false,
-    },
     is_deleted: {
       type: DataTypes.BOOLEAN,
       defaultValue: false,
@@ -46,5 +41,5 @@ const Products = sequelize.define(
 
 module.exports = Products;
 
-Products.hasOne(Product_Categories);
-Product_Categories.belongsTo(Products);
+Product_Categories.hasMany(Products);
+Products.belongsTo(Product_Categories);

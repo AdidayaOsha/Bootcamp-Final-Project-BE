@@ -1,7 +1,8 @@
 const sequelize = require("../lib/sequelize");
 const { DataTypes } = require("sequelize");
+const Products = require("./Products");
 
-const Products_Categories = sequelize.define(
+const Product_Categories = sequelize.define(
   "product_category",
   {
     name: {
@@ -18,4 +19,4 @@ const Products_Categories = sequelize.define(
   }
 );
 
-module.exports = Products_Categories;
+module.exports = Product_Categories;

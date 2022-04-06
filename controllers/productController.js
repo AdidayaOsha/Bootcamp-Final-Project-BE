@@ -1,17 +1,18 @@
 const db = require("../db");
 const Products = require("../models/Products");
-const Products_Categories = require("../models/Product_Categories");
+const Product_Categories = require("../models/Product_Categories");
 
 module.exports = {
   getProducts: async (req, res) => {
     Products.sync({ alter: true });
     try {
-      let products = await Products.findAll(
-        {},
-        {
-          includes: [Products_Categories],
-        }
-      );
+      let products = await Products.findAll({
+        include: {
+          model: Product_Categories,
+          // showing only the name that you want to view
+          attributes: ["name", "description"],
+        },
+      });
       res.status(200).send(products);
     } catch (err) {
       res.status(500).send(err);
