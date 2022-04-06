@@ -39,7 +39,7 @@ const Users = sequelize.define("users", {
     type: DataTypes.INTEGER,
     allowNull: true,
   },
-  is_verified: {
+  is_verifiedd: {
     type: DataTypes.BOOLEAN,
     allowNull: true,
   },
