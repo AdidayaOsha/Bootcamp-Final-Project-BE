@@ -31,7 +31,8 @@ const Users = sequelize.define("users", {
     allowNull: false,
     validate: {
       is: {
-        args,
+        args: /^[a-zA-Z0-9._]*$/,
+        msg: "Must be alphanumeric, (-), (_), and (.) are allowed",
       },
     },
   },
@@ -47,15 +48,7 @@ const Users = sequelize.define("users", {
     type: DataTypes.BOOLEAN,
     allowNull: true,
   },
-  created_at: {
-    type: DataTypes.DATE,
-    allowNull: true,
-  },
   last_login: {
-    type: DataTypes.DATE,
-    allowNull: true,
-  },
-  edited_at: {
     type: DataTypes.DATE,
     allowNull: true,
   },
