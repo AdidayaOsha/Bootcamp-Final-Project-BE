@@ -24,5 +24,14 @@ module.exports = {
   },
   register: async (req, res) => {
     Users.sync({ alter: true });
+  },
+  verification: async (req, res) => {
+    Users.sync({ alter: true });
+  },
+  login: async (req, res) => {
+    Users.sync({ alter: true });
+  },
+  delete: async (req, res) => {
+    Users.sync({ alter: true });
   }
 };
