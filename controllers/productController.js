@@ -6,7 +6,12 @@ module.exports = {
   getProducts: async (req, res) => {
     Products.sync({ alter: true });
     try {
-      let products = await Products.findAll({});
+      let products = await Products.findAll(
+        {},
+        {
+          includes: [Products_Categories],
+        }
+      );
       res.status(200).send(products);
     } catch (err) {
       res.status(500).send(err);
