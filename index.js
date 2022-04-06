@@ -1,6 +1,7 @@
 const express = require("express");
 const cors = require("cors");
 const sequelize = require("../back-end/lib/sequelize");
+const { adminRouter } = require("./routers");
 
 const app = express();
 app.use(cors());
@@ -20,5 +21,7 @@ const PORT = process.env.PORT || 9990;
 app.get("/", (req, res) => {
   res.status(200).send("<h1>Welcome to EMMERCE PROJECT</h1>");
 });
+
+app.use("/admin", adminRouter);
 
 app.listen(PORT, () => console.log("SERVER RUNNING IN PORT:", PORT));
