@@ -3,6 +3,7 @@ const mysql = require("mysql");
 const db = mysql.createConnection({
   hostname: "localhost",
   user: "root",
+  // masukkin password MySql kalian
   password: "",
   database: "bootcamp_group_1",
   port: 3306,

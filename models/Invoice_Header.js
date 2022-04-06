@@ -10,7 +10,15 @@ const Invoice_Header = sequelize.define("invoice_header", {
     type: DataTypes.DECIMAL,
   },
   status: {
-    type: DataTypes.INTEGER,
+    type: DataTypes.STRING,
+    defaultValue: "pending",
+    allowNull: false,
+    validate: {
+      isIn: {
+        args: [["pending", "approved", "rejected"]],
+        msg: "Wrong Value!",
+      },
+    },
   },
 });
 

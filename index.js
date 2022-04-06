@@ -11,6 +11,7 @@ const PORT = process.env.PORT || 9990;
 (async () => {
   try {
     await sequelize.authenticate();
+    // buat sync database kalau ada perubahan sekecil apapun:
     await sequelize.sync();
     console.log("Sequelize Connection established");
   } catch (err) {
