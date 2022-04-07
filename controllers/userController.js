@@ -12,7 +12,7 @@ module.exports = {
       res.status(500).send(err);
     }
   },
-  getUsersById: async (req, res) => {
+  getUserById: async (req, res) => {
     Users.sync({ alter: true });
     try {
       let id = req.params.id;

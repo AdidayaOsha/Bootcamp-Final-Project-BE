@@ -1,7 +1,7 @@
 const sequelize = require("../lib/sequelize");
 const { DataTypes } = require("sequelize");
 const Invoice_Header = require("./Invoice_Header");
-const Admin = require("./Admin");
+const Admin = require("./Admins");
 const Users = require("./Users");
 
 const Payment_Confirmation = sequelize.define("payment_confirmation", {
