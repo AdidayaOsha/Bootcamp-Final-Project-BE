@@ -1,15 +1,11 @@
 const db = require("../db");
+const Users = require("../models/Users")
 
 module.exports = {
   getUsers: async (req, res) => {
     Users.sync({ alter: true });
     try {
       let users = await Users.findAll({
-        include: {
-          model: User_Categories,
-          // showing only the name that you want to view
-          attributes: ["name", "description"],
-        },
       });
       res.status(200).send(users);
     } catch (err) {
@@ -26,4 +22,16 @@ module.exports = {
       res.status(500).send(err);
     }
   },
+  register: async (req, res) => {
+    Users.sync({ alter: true });
+  },
+  verification: async (req, res) => {
+    Users.sync({ alter: true });
+  },
+  login: async (req, res) => {
+    Users.sync({ alter: true });
+  },
+  delete: async (req, res) => {
+    Users.sync({ alter: true });
+  }
 };

@@ -1,7 +1,7 @@
 const express = require("express");
 const cors = require("cors");
 const sequelize = require("../back-end/lib/sequelize");
-const { adminProductRouter, productRouter, cartRouter } = require("./routers");
+const { adminProductRouter, productRouter, cartRouter, userRouter } = require("./routers");
 
 const app = express();
 app.use(cors());
@@ -27,5 +27,6 @@ app.use("/admin", adminProductRouter);
 app.use("/products", productRouter);
 app.use("/carts", cartRouter);
 app.use("/images", express.static("./images"));
+app.use("/users", userRouter);
 
 app.listen(PORT, () => console.log("SERVER RUNNING IN PORT:", PORT));
