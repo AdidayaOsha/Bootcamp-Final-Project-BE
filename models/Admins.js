@@ -1,7 +1,7 @@
 const sequelize = require("../lib/sequelize");
 const { DataTypes } = require("sequelize");
 
-const Admin = sequelize.define("admin", {
+const Admin = sequelize.define("admins", {
   full_name: {
     type: DataTypes.STRING,
     allowNull: false,
