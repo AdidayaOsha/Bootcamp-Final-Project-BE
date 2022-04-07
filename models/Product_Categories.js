@@ -3,7 +3,7 @@ const { DataTypes } = require("sequelize");
 const Products = require("./Products");
 
 const Product_Categories = sequelize.define(
-  "product_category",
+  "product_categories",
   {
     name: {
       type: DataTypes.STRING,
