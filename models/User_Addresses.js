@@ -2,7 +2,7 @@ const sequelize = require("../lib/sequelize");
 const { DataTypes } = require("sequelize");
 const Users = require("./Users");
 
-const User_Address = sequelize.define("user_address", {
+const User_Addresses = sequelize.define("user_addresses", {
   address_line1: {
     type: DataTypes.STRING,
     allowNull: true,
@@ -33,4 +33,4 @@ const User_Address = sequelize.define("user_address", {
   },
 });
 
-module.exports = User_Address;
+module.exports = User_Addresses;

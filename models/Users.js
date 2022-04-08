@@ -29,12 +29,12 @@ const Users = sequelize.define("users", {
   password: {
     type: DataTypes.STRING,
     allowNull: false,
-    validate: {
-      is: {
-        args: /^[a-zA-Z0-9._]*$/,
-        msg: "Must be alphanumeric, (-), (_), and (.) are allowed",
-      },
-    },
+    // validate: {
+    //   is: {
+    //     args: /^[a-zA-Z0-9._]*$/,
+    //     msg: "Must be alphanumeric, (-), (_), and (.) are allowed",
+    //   },
+    // },
   },
   phone: {
     type: DataTypes.INTEGER,
@@ -51,7 +51,7 @@ const Users = sequelize.define("users", {
   last_login: {
     type: DataTypes.DATE,
     allowNull: true,
-  },
+  }
 });
 
 module.exports = Users;
