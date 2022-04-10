@@ -47,6 +47,20 @@ module.exports = {
       res.status(500).send(err);
     }
   },
+  addProductCategory: async (req, res) => {
+    Product_Categories.sync({ alter: true });
+    try {
+      let data = {
+        name: req.body.name,
+        description: req.body.description,
+      };
+
+      const product = await Product_Categories.create(data);
+      res.status(200).send(product);
+    } catch (err) {
+      res.status(500).send(err);
+    }
+  },
   editProduct: async (req, res) => {
     Products.sync({ alter: true });
     try {
