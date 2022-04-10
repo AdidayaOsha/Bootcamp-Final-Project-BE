@@ -1,6 +1,8 @@
 const db = require("../db");
 const Products = require("../models/Products");
 const Product_Categories = require("../models/Product_Categories");
+const Warehouse_Products = require("../models/Warehouse_Products");
+const Warehouses = require("../models/Warehouses");
 
 module.exports = {
   getProducts: async (req, res) => {
@@ -9,8 +11,9 @@ module.exports = {
       let products = await Products.findAll({
         include: {
           model: Product_Categories,
+          Warehouse_Products,
+          Warehouses,
           // showing only the name that you want to view
-          attributes: ["name", "description"],
         },
       });
       res.status(200).send(products);
