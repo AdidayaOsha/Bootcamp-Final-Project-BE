@@ -35,7 +35,7 @@ module.exports = {
       const { full_name, username, email, phone, password } = req.body
       const usernameAlreadyExist = await Users.findOne({ where: { username } })
       const emailAlreadyExist = await Users.findOne({ where: { email } })
-      const phoneAlreadyExist = await Users.findOne({ where: { email } })
+      const phoneAlreadyExist = await Users.findOne({ where: { phone } })
       if (usernameAlreadyExist) {
         throw { "code": 500, "message": "This Username is already being used!", "err": null }
       } else if (emailAlreadyExist) {
