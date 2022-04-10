@@ -1,9 +1,8 @@
 const sequelize = require("../lib/sequelize");
 const { DataTypes } = require("sequelize");
 const Products = require("./Products");
-const Warehouse = require("./Warehouse");
 
-const Warehouse_Product = sequelize.define("warehouse_product", {
+const Warehouse_Products = sequelize.define("warehouse_products", {
   stock_ready: {
     type: DataTypes.INTEGER,
     allowNull: true,
@@ -14,10 +13,4 @@ const Warehouse_Product = sequelize.define("warehouse_product", {
   },
 });
 
-module.exports = Warehouse_Product;
-
-Warehouse_Product.hasOne(Products);
-Products.belongsTo(Warehouse_Product);
-
-Warehouse_Product.hasOne(Warehouse);
-Warehouse.belongsTo(Warehouse_Product);
+module.exports = Warehouse_Products;
