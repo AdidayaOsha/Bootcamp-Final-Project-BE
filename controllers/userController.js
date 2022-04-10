@@ -32,14 +32,16 @@ module.exports = {
   register: async (req, res) => {
     Users.sync({ alter: true });
     try {
-      const { full_name, username, email, password } = req.body
+      const { full_name, username, email, phone, password } = req.body
       const usernameAlreadyExist = await Users.findOne({ where: { username } })
       const emailAlreadyExist = await Users.findOne({ where: { email } })
+      const phoneAlreadyExist = await Users.findOne({ where: { email } })
       if (usernameAlreadyExist) {
-        // return res.json({ message: "User with that email is already exist!" })
-        throw { "code": 500, "message": "Username already exist!", "err": null }
+        throw { "code": 500, "message": "This Username is already being used!", "err": null }
       } else if (emailAlreadyExist) {
-        throw { "code": 500, "message": "Email already exist!", "err": null }
+        throw { "code": 500, "message": "This Email is already being used!", "err": null }
+      } else if (phoneAlreadyExist) {
+        throw { "code": 500, "message": "This Phone Number is already being used!", "err": null }
       }
 
       const saltRounds = 10;
@@ -48,6 +50,7 @@ module.exports = {
         full_name,
         username,
         email,
+        phone,
         password: hashedPassword
       });
       let idNewUser = user.dataValues.id
@@ -86,18 +89,14 @@ module.exports = {
         {
           where: { id: req.user.id }
         })
-      // console.log(updateVerification[0])
       if (updateVerification[0] == 0) {
         throw { "code": 400, "message": "Verification Failed!", "err": null }
       }
       res.status(200).send({ message: "Account Verification Success!", success: true })
-      // console.log(updateVerification);
     }
     catch (err) {
       res.status(err.code).send("Error Verification: " + err.message)
     }
-
-    // Users.sync({ alter: true });
   },
   login: async (req, res) => {
     Users.sync({ alter: true });
