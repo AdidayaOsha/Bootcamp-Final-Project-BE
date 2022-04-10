@@ -47,6 +47,15 @@ module.exports = {
       res.status(500).send(err);
     }
   },
+  getCategories: async (req, res) => {
+    Products.sync({ alter: true });
+    try {
+      let categories = await Product_Categories.findAll({});
+      res.status(200).send(categories);
+    } catch (err) {
+      res.status(500).send(err);
+    }
+  },
   addProductCategory: async (req, res) => {
     Product_Categories.sync({ alter: true });
     try {
