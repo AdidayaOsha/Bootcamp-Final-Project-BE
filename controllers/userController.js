@@ -87,7 +87,8 @@ module.exports = {
       });
       res.status(200).send(user);
     } catch (err) {
-      res.status(err.code).send("Error Register: " + err.message);
+      console.log(err);
+      res.status(500).send("Error Register: " + err.message);
     }
   },
   verification: async (req, res) => {
