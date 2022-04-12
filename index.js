@@ -7,6 +7,7 @@ const {
   productRouter,
   cartRouter,
   userRouter,
+  catalogRouter,
 } = require("./routers");
 
 const app = express();
