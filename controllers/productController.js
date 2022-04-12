@@ -13,12 +13,7 @@ module.exports = {
       let products = await Products.findAll({
         nested: true,
         limit: 10,
-        include: [
-          { model: Product_Categories },
-          { model: Warehouse_Products },
-          { model: Warehouses },
-          // showing only the name that you want to view
-        ],
+        include: [{ all: true }],
       });
       res.status(200).send(products);
     } catch (err) {
@@ -84,6 +79,7 @@ module.exports = {
     try {
       let product = await Products.findOne({
         where: {
+          include: [{ all: true }],
           name: {
             [Op.like]: "%" + req.body.name + "%",
           },
@@ -99,11 +95,7 @@ module.exports = {
     try {
       // Products.sync({ alter: true });
       let products = await Products.findAll({
-        include: {
-          model: Product_Categories,
-          Warehouses,
-          Warehouse_Products,
-        },
+        include: [{ all: true }],
         order: [["name", "ASC"]],
       });
       res.status(200).send(products);
@@ -115,11 +107,7 @@ module.exports = {
   onSortNameDesc: async (req, res) => {
     try {
       let products = await Products.findAll({
-        include: {
-          model: Product_Categories,
-          Warehouses,
-          Warehouse_Products,
-        },
+        include: [{ all: true }],
         order: [["name", "DESC"]],
       });
       res.status(200).send(products);
@@ -130,11 +118,7 @@ module.exports = {
   onSortPriceAsc: async (req, res) => {
     try {
       let price = await Products.findAll({
-        include: {
-          model: Product_Categories,
-          Warehouses,
-          Warehouse_Products,
-        },
+        include: [{ all: true }],
         order: [["price", "ASC"]],
       });
       res.status(200).send(price);
@@ -145,11 +129,7 @@ module.exports = {
   onSortPriceDesc: async (req, res) => {
     try {
       let price = await Products.findAll({
-        include: {
-          model: Product_Categories,
-          Warehouses,
-          Warehouse_Products,
-        },
+        include: [{ all: true }],
         order: [["price", "DESC"]],
       });
       res.status(200).send(price);
