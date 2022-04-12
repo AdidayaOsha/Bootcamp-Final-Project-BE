@@ -29,11 +29,6 @@ const Products = sequelize.define(
         },
       },
     },
-    is_deleted: {
-      type: DataTypes.BOOLEAN,
-      defaultValue: false,
-      allowNull: true,
-    },
   },
   {
     paranoid: true,
