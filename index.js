@@ -34,6 +34,7 @@ app.use("/admins", adminRouter);
 app.use("/admin", adminProductRouter);
 app.use("/products", productRouter);
 app.use("/carts", cartRouter);
+app.use("/catalog", catalogRouter);
 app.use("/Images", express.static("./Images"));
 app.use("/users", userRouter);
 
