@@ -10,6 +10,7 @@ const Warehouse_Products = sequelize.define("warehouse_products", {
   stock_reserved: {
     type: DataTypes.INTEGER,
     allowNull: true,
+    defaultValue: 0,
   },
 });
 

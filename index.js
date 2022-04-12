@@ -20,7 +20,7 @@ const PORT = process.env.PORT || 9990;
     await sequelize.authenticate();
     // buat sync database kalau ada perubahan sekecil apapun:
     // await sequelize.sync({ alter: true });
-    console.log("Sequelize Connection established");
+    // console.log("Sequelize Connection established");
   } catch (err) {
     console.log(err);
   }
@@ -34,7 +34,7 @@ app.use("/admins", adminRouter);
 app.use("/admin", adminProductRouter);
 app.use("/products", productRouter);
 app.use("/carts", cartRouter);
-app.use("/images", express.static("./images"));
+app.use("/Images", express.static("./Images"));
 app.use("/users", userRouter);
 
 app.listen(PORT, () => console.log("SERVER RUNNING IN PORT:", PORT));
