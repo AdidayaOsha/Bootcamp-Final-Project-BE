@@ -21,10 +21,19 @@ module.exports = {
     }
   },
   getProductById: async (req, res) => {
-    // Products.sync({ alter: true });
+    Products.sync({ alter: true });
     try {
       let id = req.params.id;
-      let product = await Products.findOne({ where: { id: id } });
+      let product = await Products.findOne({
+        nested: true,
+        where: { id: id },
+        include: [
+          { model: Warehouse_Products },
+          { model: Product_Categories },
+          { model: Warehouses },
+        ],
+      });
+
       res.status(200).send(product);
     } catch (err) {
       res.status(500).send(err);
@@ -79,9 +88,9 @@ module.exports = {
     try {
       let product = await Products.findOne({
         where: {
-          include: [{ all: true }],
+          // include: [{ all: true }],
           name: {
-            [Op.like]: "%" + req.body.name + "%",
+            [Op.substring]: req.body.name,
           },
         },
       });
