@@ -13,7 +13,10 @@ module.exports = {
       let products = await Products.findAll({
         nested: true,
         limit: 10,
-        include: [{ all: true }],
+        include: [
+          { model: Product_Categories },
+          { model: Warehouse_Products, include: Warehouses },
+        ],
       });
       res.status(200).send(products);
     } catch (err) {
@@ -28,9 +31,8 @@ module.exports = {
         nested: true,
         where: { id: id },
         include: [
-          { model: Warehouse_Products },
           { model: Product_Categories },
-          { model: Warehouses },
+          { model: Warehouse_Products, include: Warehouses },
         ],
       });
 
@@ -49,7 +51,6 @@ module.exports = {
         description: req.body.description,
         price: req.body.price,
         productCategoryId: req.body.productCategoryId,
-        warehouseId: req.body.warehouseId,
       };
       const product = await Products.create(data);
       await product.createWarehouse_product({
