@@ -40,5 +40,5 @@ module.exports = Products;
 Product_Categories.hasMany(Products);
 Products.belongsTo(Product_Categories);
 
-Products.hasOne(Warehouse_Products);
+Products.hasMany(Warehouse_Products);
 Warehouse_Products.belongsTo(Products);
