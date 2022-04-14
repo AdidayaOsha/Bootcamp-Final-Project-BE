@@ -24,8 +24,21 @@ module.exports = {
     },
     login: async (req, res) => {
         Admin.sync({ alter: true });
-    },
-    delete: async (req, res) => {
-        Admin.sync({ alter: true });
+        try {
+            const { email, password } = req.body;
+
+            const adminWithEmail = await Admin.findOne({ where: { email } }).catch((err) => {
+                console.log(err)
+            })
+
+            if (!adminWithEmail)
+                return res.json({ message: "Email or password does not match!" });
+            if (adminWithEmail.dataValues.password !== password)
+                return res.json({ message: "Email or password does not match!" })
+
+            res.status(200).send({ message: "Welcome Admin!" });
+        } catch (err) {
+            res.send(err);
+        }
     }
 };

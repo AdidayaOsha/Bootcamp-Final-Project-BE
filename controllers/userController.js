@@ -3,6 +3,7 @@ const bcrypt = require("bcrypt");
 const Users = require("../models/Users");
 const { createToken } = require("../helper/createToken");
 const transporter = require("../helper/nodemailer");
+const { hash } = require("bcrypt");
 
 module.exports = {
   getUsers: async (req, res) => {
@@ -87,7 +88,7 @@ module.exports = {
       });
       res.status(200).send(user);
     } catch (err) {
-      res.status(err.code).send("Error Register: " + err.message);
+      res.send(err);
     }
   },
   verification: async (req, res) => {
@@ -113,8 +114,34 @@ module.exports = {
   },
   login: async (req, res) => {
     Users.sync({ alter: true });
+    try {
+      const { email, password } = req.body;
+
+      const userWithEmail = await Users.findOne({ where: { email } }).catch((err) => {
+        console.log(err)
+      })
+      if (!userWithEmail)
+        return res.json({ message: "Email or password does not match!" });
+      const validPass = await bcrypt.compare(password, userWithEmail.dataValues.password)
+      if (!validPass)
+        return res.json({ message: "Email or password does not match!" })
+
+      delete userWithEmail.dataValues.password;
+      let token = createToken(userWithEmail.dataValues);
+      res.status(200).send({ message: "Welcome back!", token, dataUser: userWithEmail.dataValues });
+
+    } catch (err) {
+      res.send(err);
+    }
   },
-  delete: async (req, res) => {
+  getDataUser: async (req, res) => {
     Users.sync({ alter: true });
+    console.log(req.user)
+    let user = await Users.findOne({
+      where: {
+        id: req.user.id,
+      },
+    });
+    res.status(200).send(user)
   },
 };

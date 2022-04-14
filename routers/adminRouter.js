@@ -3,7 +3,6 @@ const { adminController } = require("../controllers");
 
 router.get("/", adminController.getAdmins);
 router.get("/:id", adminController.getAdminById);
-// router.patch("/login", adminController.login);
-// router.delete("/delete/:id", adminController.deleteUsersById);
+router.post("/login", adminController.login);
 
 module.exports = router;
