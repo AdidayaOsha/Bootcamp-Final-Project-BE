@@ -3,13 +3,14 @@ const { productController } = require("../controllers");
 const upload = require("../lib/multer");
 
 router.get("/", productController.getProducts);
+router.get("/get", productController.getProductsByPage);
 router.get("/categories", productController.getCategories);
 router.get("/warehouses", productController.getWarehouses);
-router.get("/search/:id", productController.getProductById);
+router.get("/find/:id", productController.getProductById);
 router.post("/search", productController.searchProduct);
 router.post("/add", upload, productController.addProduct);
 router.post("/addcategory", productController.addProductCategory);
-router.patch("/update/:id", productController.editProduct);
+router.patch("/update/:id", productController.updateProduct);
 router.delete("/delete/:id", productController.deleteProduct);
 router.get("/sort/az", productController.onSortNameAsc);
 router.get("/sort/za", productController.onSortNameDesc);
