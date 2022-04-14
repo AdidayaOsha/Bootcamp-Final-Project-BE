@@ -10,28 +10,12 @@ module.exports = {
   getProducts: async (req, res) => {
     Products.sync({ alter: true });
     try {
-      let products = await Products.findAll({
-        nested: true,
-        limit: 10,
-        include: [
-          { model: Product_Categories },
-          { model: Warehouse_Products, include: Warehouses },
-        ],
-      });
-      res.status(200).send(products);
-    } catch (err) {
-      res.status(500).send(err);
-    }
-  },
-  getProductsByPage: async (req, res) => {
-    // Products.sync({ alter: true });
-    try {
       let { page, size } = req.query;
       if (!page) {
         page = 1;
       }
       if (!size) {
-        size = 4;
+        size = 10;
       }
       const limit = +size;
       const skip = (page - 1) * size;
@@ -88,6 +72,7 @@ module.exports = {
       console.log(err);
       res.status(500).send(err);
     }
+    console.log(req.file);
   },
   updateProduct: async (req, res) => {
     // Products.sync({ alter: true });
@@ -107,7 +92,17 @@ module.exports = {
     try {
       let id = req.params.id;
       await Products.destroy({ where: { id: id } });
-      res.status(200).send("product is deleted");
+      res.status(200).send("Product Has Been Deleted");
+    } catch (err) {
+      res.status(500).send(err);
+    }
+  },
+  deleteCategories: async (req, res) => {
+    Product_Categories.sync({ alter: true });
+    try {
+      let id = req.params.id;
+      await Product_Categories.destroy({ where: { id: id } });
+      res.status(200).send("Categories Has Been Deleted");
     } catch (err) {
       res.status(500).send(err);
     }
