@@ -8,7 +8,7 @@ const sequelize = require("../lib/sequelize");
 
 module.exports = {
   getProducts: async (req, res) => {
-    // Products.sync({ alter: true });
+    Products.sync({ alter: true });
     try {
       let products = await Products.findAll({
         nested: true,
@@ -23,12 +23,37 @@ module.exports = {
       res.status(500).send(err);
     }
   },
+  getProductsByPage: async (req, res) => {
+    // Products.sync({ alter: true });
+    try {
+      let { page, size } = req.query;
+      if (!page) {
+        page = 1;
+      }
+      if (!size) {
+        size = 4;
+      }
+      const limit = +size;
+      const skip = (page - 1) * size;
+      let products = await Products.findAll({
+        nested: true,
+        offset: skip,
+        limit: limit,
+        include: [
+          { model: Product_Categories },
+          { model: Warehouse_Products, include: Warehouses },
+        ],
+      });
+      res.status(200).send(products);
+    } catch (err) {
+      res.status(500).send(err);
+    }
+  },
   getProductById: async (req, res) => {
     Products.sync({ alter: true });
     try {
       let id = req.params.id;
-      let product = await Products.findOne({
-        nested: true,
+      let product = await Products.findAll({
         where: { id: id },
         include: [
           { model: Product_Categories },
@@ -64,12 +89,15 @@ module.exports = {
       res.status(500).send(err);
     }
   },
-  editProduct: async (req, res) => {
+  updateProduct: async (req, res) => {
     // Products.sync({ alter: true });
     try {
       let id = req.params.id;
       const products = await Products.update(req.body, { where: { id: id } });
-      res.status(200).send(products);
+      const products2 = await Warehouse_Products.update(req.body, {
+        where: { id: id },
+      });
+      res.status(200).send({ products, products2 });
     } catch (err) {
       res.status(500).send(err);
     }
@@ -85,11 +113,14 @@ module.exports = {
     }
   },
   searchProduct: async (req, res) => {
-    // Products.sync({ alter: true });
+    Products.sync({ alter: true });
     try {
-      let product = await Products.findOne({
+      let product = await Products.findAll({
+        include: [
+          { model: Product_Categories },
+          { model: Warehouse_Products, include: Warehouses },
+        ],
         where: {
-          // include: [{ all: true }],
           name: {
             [Op.substring]: req.body.name,
           },
@@ -105,7 +136,10 @@ module.exports = {
     try {
       // Products.sync({ alter: true });
       let products = await Products.findAll({
-        include: [{ all: true }],
+        include: [
+          { model: Product_Categories },
+          { model: Warehouse_Products, include: Warehouses },
+        ],
         order: [["name", "ASC"]],
       });
       res.status(200).send(products);
@@ -117,7 +151,10 @@ module.exports = {
   onSortNameDesc: async (req, res) => {
     try {
       let products = await Products.findAll({
-        include: [{ all: true }],
+        include: [
+          { model: Product_Categories },
+          { model: Warehouse_Products, include: Warehouses },
+        ],
         order: [["name", "DESC"]],
       });
       res.status(200).send(products);
@@ -128,7 +165,10 @@ module.exports = {
   onSortPriceAsc: async (req, res) => {
     try {
       let price = await Products.findAll({
-        include: [{ all: true }],
+        include: [
+          { model: Product_Categories },
+          { model: Warehouse_Products, include: Warehouses },
+        ],
         order: [["price", "ASC"]],
       });
       res.status(200).send(price);
@@ -139,7 +179,10 @@ module.exports = {
   onSortPriceDesc: async (req, res) => {
     try {
       let price = await Products.findAll({
-        include: [{ all: true }],
+        include: [
+          { model: Product_Categories },
+          { model: Warehouse_Products, include: Warehouses },
+        ],
         order: [["price", "DESC"]],
       });
       res.status(200).send(price);

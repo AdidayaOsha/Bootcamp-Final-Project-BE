@@ -1,6 +1,7 @@
 const sequelize = require("../lib/sequelize");
 const { DataTypes } = require("sequelize");
 const Products = require("./Products");
+const Warehouses = require("./Warehouses");
 
 const Warehouse_Products = sequelize.define("warehouse_products", {
   stock_ready: {
@@ -15,3 +16,6 @@ const Warehouse_Products = sequelize.define("warehouse_products", {
 });
 
 module.exports = Warehouse_Products;
+
+Warehouses.hasMany(Warehouse_Products);
+Warehouse_Products.belongsTo(Warehouses);
