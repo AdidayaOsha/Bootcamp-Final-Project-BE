@@ -35,7 +35,7 @@ app.use("/admin", adminProductRouter);
 app.use("/products", productRouter);
 app.use("/carts", cartRouter);
 app.use("/catalog", catalogRouter);
-app.use("/Images", express.static("./Images"));
+app.use("/images", express.static("./images"));
 app.use("/users", userRouter);
 
 app.listen(PORT, () => console.log("SERVER RUNNING IN PORT:", PORT));
