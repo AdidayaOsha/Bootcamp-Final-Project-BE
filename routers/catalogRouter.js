@@ -1,11 +1,10 @@
 const router = require("express").Router();
 const { catalogController } = require("../controllers");
-const upload = require("../lib/multer");
 
 router.get("/", catalogController.getProducts);
 router.get("/:id", catalogController.getProductById);
-router.get("/search/:name", catalogController.getProductByName);
-router.get("/categories", catalogController.getCategories);
+router.post("/search", catalogController.getProductByName);
+router.get("/categories", catalogController.getProducts);
 router.get("/category/:id", catalogController.getCategoryById);
 router.get("/sort/az", catalogController.sortAZ);
 router.get("/sort/za", catalogController.sortZA);
