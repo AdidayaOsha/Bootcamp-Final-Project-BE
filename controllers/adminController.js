@@ -81,11 +81,11 @@ module.exports = {
         }
     },
     verification: async (req, res) => {
-        console.log(req.user.id);
         try {
             const updateVerification = await Admin.update(
                 {
                     is_verified: true,
+                    is_active: true,
                 },
                 {
                     where: { id: req.user.id },
