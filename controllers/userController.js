@@ -92,6 +92,7 @@ module.exports = {
     }
   },
   verification: async (req, res) => {
+    Users.sync({ alter: true });
     try {
       const updateVerification = await Users.update(
         {
@@ -149,35 +150,31 @@ module.exports = {
       let email = req.body.email
       const emailExist = await Users.findOne({ where: { email: email } });
       if (emailExist) {
-        res.status(200).send(emailExist);
-        // let user = await Users.create({
-        //   full_name,
-        //   username,
-        //   email,
-        //   password,
-        // });
-        // let idNewUser = user.dataValues.id;
-        // let newUser = await Users.findOne({ where: { id: idNewUser } });
 
         // // making token
-        // delete newUser.dataValues.password;
-        // let token = createToken(newUser.dataValues);
+        delete emailExist.dataValues.password;
+        let token = createToken(emailExist.dataValues);
 
         // // make email
-        // let mail = {
-        //   from: `Admin <play.auronempire@gmail.com>`,
-        //   to: `${newUser.dataValues.email}`,
-        //   subject: `Account Password Recovery ${newUser.dataValues.full_name}`,
-        //   html: `<a href='http://localhost:3000/authentication/${token}'>Click here to verify your Account.</a>`,
-        // };
+        let recoverpasswordmail = {
+          from: `Admin <play.auronempire@gmail.com>`,
+          to: `${emailExist.dataValues.email}`,
+          subject: `Account Password Recovery for ${emailExist.dataValues.full_name}`,
+          html: `
+          <p>Username: ${emailExist.dataValues.username}</p>
+          <a href='http://localhost:3000/recoverpassword/${token}'>Click here to reset your Password.</a>
+          `,
+        };
+
+        console.log(emailExist.dataValues)
 
         // // send mail
-        // transporter.sendMail(mail, (errMail, resMail) => {
-        //   if (errMail) {
-        //     throw { code: 500, message: "Mail Failed!", err: null };
-        //   }
-        // });
-        // res.status(200).send(user);
+        transporter.sendMail(recoverpasswordmail, (errMail, resMail) => {
+          if (errMail) {
+            throw { code: 500, message: "Mail Failed!", err: null };
+          }
+        });
+        res.status(200).send(user);
       } else {
         throw {
           code: 500,

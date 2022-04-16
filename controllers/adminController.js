@@ -81,6 +81,7 @@ module.exports = {
         }
     },
     verification: async (req, res) => {
+        Admin.sync({ alter: true });
         try {
             const updateVerification = await Admin.update(
                 {
