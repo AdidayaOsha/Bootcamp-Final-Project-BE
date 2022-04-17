@@ -8,7 +8,7 @@ const sequelize = require("../lib/sequelize");
 
 module.exports = {
   getProducts: async (req, res) => {
-    Products.sync({ alter: true });
+    // Products.sync({ alter: true });
     try {
       let { page, size } = req.query;
       if (!page) {
@@ -34,7 +34,7 @@ module.exports = {
     }
   },
   getProductById: async (req, res) => {
-    Products.sync({ alter: true });
+    // Products.sync({ alter: true });
     try {
       let id = req.params.id;
       let product = await Products.findAll({
@@ -51,7 +51,7 @@ module.exports = {
     }
   },
   addProduct: async (req, res) => {
-    Products.sync({ alter: true });
+    // Products.sync({ alter: true });
     try {
       let data = {
         //use file to upload only a single image, not files.
@@ -88,7 +88,7 @@ module.exports = {
     }
   },
   deleteProduct: async (req, res) => {
-    Products.sync({ alter: true });
+    // Products.sync({ alter: true });
     try {
       let id = req.params.id;
       await Products.destroy({ where: { id: id } });
@@ -98,7 +98,7 @@ module.exports = {
     }
   },
   deleteCategories: async (req, res) => {
-    Product_Categories.sync({ alter: true });
+    // Product_Categories.sync({ alter: true });
     try {
       let id = req.params.id;
       await Product_Categories.destroy({ where: { id: id } });
@@ -108,7 +108,7 @@ module.exports = {
     }
   },
   searchProduct: async (req, res) => {
-    Products.sync({ alter: true });
+    // Products.sync({ alter: true });
     try {
       let product = await Products.findAll({
         include: [
