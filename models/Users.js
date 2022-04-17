@@ -37,7 +37,7 @@ const Users = sequelize.define("users", {
     // },
   },
   phone: {
-    type: DataTypes.INTEGER,
+    type: DataTypes.STRING,
     allowNull: true,
   },
   is_verified: {

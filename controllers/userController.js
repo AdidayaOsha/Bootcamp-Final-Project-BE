@@ -3,6 +3,7 @@ const bcrypt = require("bcrypt");
 const Users = require("../models/Users");
 const { createToken } = require("../helper/createToken");
 const transporter = require("../helper/nodemailer");
+const { hash } = require("bcrypt");
 
 module.exports = {
   getUsers: async (req, res) => {
@@ -87,15 +88,16 @@ module.exports = {
       });
       res.status(200).send(user);
     } catch (err) {
-      res.status(err.code).send("Error Register: " + err.message);
+      res.send(err);
     }
   },
   verification: async (req, res) => {
-    console.log(req.user.id);
+    Users.sync({ alter: true });
     try {
       const updateVerification = await Users.update(
         {
           is_verified: true,
+          is_active: true,
         },
         {
           where: { id: req.user.id },
@@ -113,8 +115,78 @@ module.exports = {
   },
   login: async (req, res) => {
     Users.sync({ alter: true });
+    try {
+      const { email, password } = req.body;
+
+      const userWithEmail = await Users.findOne({ where: { email } }).catch((err) => {
+        console.log(err)
+      })
+      if (!userWithEmail)
+        return res.json({ message: "Email or password does not match!" });
+      const validPass = await bcrypt.compare(password, userWithEmail.dataValues.password)
+      if (!validPass)
+        return res.json({ message: "Email or password does not match!" })
+
+      delete userWithEmail.dataValues.password;
+      let token = createToken(userWithEmail.dataValues);
+      res.status(200).send({ message: "Welcome back!", token, dataUser: userWithEmail.dataValues });
+
+    } catch (err) {
+      res.send(err);
+    }
   },
-  delete: async (req, res) => {
+  getDataUser: async (req, res) => {
+    Users.sync({ alter: true });
+    let user = await Users.findOne({
+      where: {
+        id: req.user.id,
+      },
+    });
+    res.status(200).send(user)
+  },
+  forgotPassword: async (req, res) => {
+    Users.sync({ alter: true });
+    try {
+      let email = req.body.email
+      const emailExist = await Users.findOne({ where: { email: email } });
+      if (emailExist) {
+
+        // // making token
+        delete emailExist.dataValues.password;
+        let token = createToken(emailExist.dataValues);
+
+        // // make email
+        let recoverpasswordmail = {
+          from: `Admin <play.auronempire@gmail.com>`,
+          to: `${emailExist.dataValues.email}`,
+          subject: `Account Password Recovery for ${emailExist.dataValues.full_name}`,
+          html: `
+          <p>Username: ${emailExist.dataValues.username}</p>
+          <a href='http://localhost:3000/recoverpassword/${token}'>Click here to reset your Password.</a>
+          `,
+        };
+
+        console.log(emailExist.dataValues)
+
+        // // send mail
+        transporter.sendMail(recoverpasswordmail, (errMail, resMail) => {
+          if (errMail) {
+            throw { code: 500, message: "Mail Failed!", err: null };
+          }
+        });
+        res.status(200).send(user);
+      } else {
+        throw {
+          code: 500,
+          message: "Email not Found!",
+          err: null,
+        };
+      }
+    } catch (err) {
+      res.send(err);
+    }
+  },
+  recoverPassword: async (req, res) => {
     Users.sync({ alter: true });
   },
 };
