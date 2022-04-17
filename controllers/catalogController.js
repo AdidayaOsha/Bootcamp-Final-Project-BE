@@ -38,11 +38,14 @@ module.exports = {
     }
   },
   getProductByName: async (req, res) => {
-    //  Products.sync({ alter: true });
+    Products.sync({ alter: true });
     try {
-      let product = await Products.findOne({
+      let product = await Products.findAll({
+        include: [
+          { model: Product_Categories },
+          { model: Warehouse_Products, include: Warehouses },
+        ],
         where: {
-          // include: [{ all: true }],
           name: {
             [Op.substring]: req.body.name,
           },
