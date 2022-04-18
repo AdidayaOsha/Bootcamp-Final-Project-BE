@@ -29,6 +29,11 @@ const Products = sequelize.define(
         },
       },
     },
+    is_deleted: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+      allowNull: true,
+    },
   },
   {
     paranoid: true,
@@ -40,5 +45,5 @@ module.exports = Products;
 Product_Categories.hasMany(Products);
 Products.belongsTo(Product_Categories);
 
-Products.hasMany(Warehouse_Products);
+Products.hasOne(Warehouse_Products);
 Warehouse_Products.belongsTo(Products);

@@ -37,3 +37,9 @@ const Warehouses = sequelize.define(
 );
 
 module.exports = Warehouses;
+
+Warehouses.hasOne(Warehouse_Products);
+Warehouse_Products.belongsTo(Warehouses);
+
+Warehouses.hasMany(Products);
+Products.belongsTo(Warehouses);
