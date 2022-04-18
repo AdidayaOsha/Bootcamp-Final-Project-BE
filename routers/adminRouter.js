@@ -1,9 +1,12 @@
 const router = require("express").Router();
 const { adminController } = require("../controllers");
+const { auth } = require('../helper/authToken')
 
 router.get("/", adminController.getAdmins);
 router.get("/:id", adminController.getAdminById);
-// router.patch("/login", adminController.login);
-// router.delete("/delete/:id", adminController.deleteUsersById);
+router.post("/register", adminController.register);
+router.patch("/verification", auth, adminController.verification);
+router.post("/login", adminController.login);
+router.post("/auth", auth, adminController.getDataAdmin);
 
 module.exports = router;

@@ -5,11 +5,6 @@ const Admin = sequelize.define("admins", {
   full_name: {
     type: DataTypes.STRING,
     allowNull: false,
-    validate: {
-      isAlpha: {
-        msg: "Only letters are allowed",
-      },
-    },
   },
   username: {
     type: DataTypes.STRING,
@@ -27,11 +22,15 @@ const Admin = sequelize.define("admins", {
   password: {
     type: DataTypes.STRING,
     allowNull: false,
-    validate: {
-      isAlphanumeric: {
-        msg: "Must be a combination of characters, and numerals",
-      },
-    },
+    // validate: {
+    //   isAlphanumeric: {
+    //     msg: "Must be a combination of characters, and numerals",
+    //   },
+    // },
+  },
+  is_verified: {
+    type: DataTypes.BOOLEAN,
+    allowNull: true,
   },
   is_active: {
     type: DataTypes.BOOLEAN,
