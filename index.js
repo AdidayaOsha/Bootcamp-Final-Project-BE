@@ -1,6 +1,6 @@
 const express = require("express");
 const cors = require("cors");
-const sequelize = require("../back-end/lib/sequelize");
+const sequelize = require("../Bootcamp-Final-Project-BE/lib/sequelize");
 const {
   adminRouter,
   adminProductRouter,
@@ -19,8 +19,8 @@ const PORT = process.env.PORT || 9990;
   try {
     await sequelize.authenticate();
     // buat sync database kalau ada perubahan sekecil apapun:
-    // await sequelize.sync({ alter: true });
-    // console.log("Sequelize Connection established");
+    await sequelize.sync({ alter: true });
+    console.log("Sequelize Connection established");
   } catch (err) {
     console.log(err);
   }
@@ -30,8 +30,8 @@ app.get("/", (req, res) => {
   res.status(200).send("<h1>Welcome to EMMERCE PROJECT</h1>");
 });
 
-app.use("/admins", adminRouter);
 app.use("/admin", adminProductRouter);
+app.use("/admins", adminRouter);
 app.use("/products", productRouter);
 app.use("/carts", cartRouter);
 app.use("/catalog", catalogRouter);

@@ -6,7 +6,8 @@ router.get("/", userController.getUsers);
 router.get("/:id", userController.getUserById);
 router.post("/register", userController.register);
 router.patch("/verification", auth, userController.verification);
-// router.patch("/login", userController.login);
-// router.delete("/delete/:id", userController.deleteUsersById);
+router.post("/login", userController.login);
+router.post("/auth", auth, userController.getDataUser);
+router.post("/forgotpassword", userController.forgotPassword);
 
 module.exports = router;
