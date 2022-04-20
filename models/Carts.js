@@ -10,6 +10,9 @@ const Carts = sequelize.define("carts", {
   },
   subtotal: {
     type: DataTypes.VIRTUAL,
+    get() {
+      return this.product?.price * this.quantity;
+    },
   },
 });
 

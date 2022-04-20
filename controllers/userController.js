@@ -258,4 +258,22 @@ module.exports = {
       res.status(err.code).send("Error Password Recovery: " + err.message);
     }
   },
+  addUserAddress: async (req, res) => {
+    try {
+      let data = {
+        address_line: req.body.address_line,
+        address_type: req.body.address_type,
+        city: req.body.city,
+        province: req.body.province,
+        postal_code: req.body.postal_code,
+        phone: req.body.phone,
+        mobile: req.body.mobile,
+      };
+      const address = await User_Addresses.create(data);
+      res.status(200).send(address);
+    } catch (err) {
+      console.log(err);
+      res.status(500).send(err);
+    }
+  },
 };
