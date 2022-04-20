@@ -1,6 +1,6 @@
 const express = require("express");
 const cors = require("cors");
-const sequelize = require("../back-end/lib/sequelize");
+const sequelize = require("./lib/sequelize");
 const {
   adminRouter,
   adminProductRouter,
