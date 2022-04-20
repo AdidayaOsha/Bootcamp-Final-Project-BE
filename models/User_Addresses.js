@@ -3,13 +3,13 @@ const { DataTypes } = require("sequelize");
 const Users = require("./Users");
 
 const User_Addresses = sequelize.define("user_addresses", {
-  address_line1: {
+  address_line: {
     type: DataTypes.STRING,
     allowNull: true,
   },
-  address_line2: {
+  address_type: {
     type: DataTypes.STRING,
-    allowNull: false,
+    allowNull: true,
   },
   city: {
     type: DataTypes.STRING,
@@ -29,6 +29,10 @@ const User_Addresses = sequelize.define("user_addresses", {
   },
   mobile: {
     type: DataTypes.INTEGER,
+    allowNull: true,
+  },
+  isDefault: {
+    type: DataTypes.BOOLEAN,
     allowNull: true,
   },
 });
