@@ -8,7 +8,7 @@ module.exports = {
     // Products.sync({ alter: true });
     try {
       let carts = await Carts.findAll({
-        include: [{ model: Products }, { model: Users }],
+        include: [{ model: Users }, { model: Products }],
       });
       res.status(200).send(carts);
     } catch (err) {

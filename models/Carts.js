@@ -3,17 +3,17 @@ const { DataTypes } = require("sequelize");
 const Products = require("./Products");
 const Users = require("./Users");
 
-const Cart = sequelize.define("cart", {
+const Carts = sequelize.define("carts", {
   quantity: {
     type: DataTypes.INTEGER,
     allowNull: false,
   },
 });
 
-module.exports = Cart;
+module.exports = Carts;
 
-Products.hasMany(Cart);
-Cart.belongsTo(Products);
+Products.hasMany(Carts);
+Carts.belongsTo(Products);
 
-Users.hasMany(Cart);
-Cart.belongsTo(Users);
+Users.hasMany(Carts);
+Carts.belongsTo(Users);

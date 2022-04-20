@@ -17,7 +17,7 @@ module.exports = {
       if (!size) {
         size = 10;
       }
-      const limit = +size;
+      const limit = +size
       const skip = (page - 1) * size;
       let products = await Products.findAll({
         nested: true,
@@ -44,7 +44,6 @@ module.exports = {
           { model: Warehouse_Products, include: Warehouses },
         ],
       });
-
       res.status(200).send(product);
     } catch (err) {
       res.status(500).send(err);
