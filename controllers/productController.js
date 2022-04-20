@@ -17,7 +17,7 @@ module.exports = {
       if (!size) {
         size = 10;
       }
-      const limit = +size
+      const limit = +size;
       const skip = (page - 1) * size;
       let products = await Products.findAll({
         nested: true,

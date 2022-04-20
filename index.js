@@ -1,6 +1,6 @@
 const express = require("express");
 const cors = require("cors");
-const sequelize = require("../Bootcamp-Final-Project-BE/lib/sequelize");
+const sequelize = require("./lib/sequelize");
 const {
   adminRouter,
   adminProductRouter,
@@ -30,8 +30,8 @@ app.get("/", (req, res) => {
   res.status(200).send("<h1>Welcome to EMMERCE PROJECT</h1>");
 });
 
-app.use("/admin", adminProductRouter);
 app.use("/admins", adminRouter);
+app.use("/admin", adminProductRouter);
 app.use("/products", productRouter);
 app.use("/carts", cartRouter);
 app.use("/catalog", catalogRouter);
