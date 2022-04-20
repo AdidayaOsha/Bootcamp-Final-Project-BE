@@ -40,20 +40,25 @@ module.exports = {
   getProductByName: async (req, res) => {
     Products.sync({ alter: true });
     try {
-      let search = req.params.name;
-      let product = await Products.findAll({ where: {
-        name: {
-          [Op.like]: search
-        }
-      } 
-    });
+      let product = await Products.findAll({
+        include: [
+          { model: Product_Categories },
+          { model: Warehouse_Products, include: Warehouses },
+        ],
+        where: {
+          name: {
+            [Op.substring]: req.body.name,
+          },
+        },
+      });
       res.status(200).send(product);
     } catch (err) {
       res.status(500).send(err);
+      console.log(err);
     }
   },
   getCategories: async (req, res) => {
-    Product_Categories.sync({ alter: true });
+    Products.sync({ alter: true });
     try {
       let categories = await Product_Categories.findAll({});
       res.status(200).send(categories);

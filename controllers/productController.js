@@ -44,7 +44,6 @@ module.exports = {
           { model: Warehouse_Products, include: Warehouses },
         ],
       });
-
       res.status(200).send(product);
     } catch (err) {
       res.status(500).send(err);

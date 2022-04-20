@@ -13,8 +13,8 @@ const Products = sequelize.define(
     },
     name: {
       type: DataTypes.STRING,
-      defaultValue: "example of the File Name",
-      allowNull: false,
+      defaultValue: "",
+      allowNull: true,
     },
     description: {
       type: DataTypes.STRING,
