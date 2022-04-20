@@ -4,6 +4,10 @@ const Users = require("../models/Users");
 const { createToken } = require("../helper/createToken");
 const transporter = require("../helper/nodemailer");
 const { hash } = require("bcrypt");
+const Carts = require("../models/Carts");
+const Products = require("../models/Products");
+const Warehouse_Products = require("../models/Warehouse_Products");
+const User_Addresses = require("../models/User_Addresses");
 
 module.exports = {
   getUsers: async (req, res) => {
@@ -118,19 +122,45 @@ module.exports = {
     try {
       const { email, password } = req.body;
 
-      const userWithEmail = await Users.findOne({ where: { email } }).catch((err) => {
-        console.log(err)
-      })
+      const userWithEmail = await Users.findOne({
+        where: { email },
+        include: [
+          {
+            model: User_Addresses,
+          },
+          {
+            model: Carts,
+            include: [{ model: Products, include: Warehouse_Products }],
+          },
+        ],
+      }).catch((err) => {
+        console.log(err);
+      });
       if (!userWithEmail)
-        throw { code: 400, message: "Email or password does not match!", err: null };
-      const validPass = await bcrypt.compare(password, userWithEmail.dataValues.password)
+        throw {
+          code: 400,
+          message: "Email or password does not match!",
+          err: null,
+        };
+      const validPass = await bcrypt.compare(
+        password,
+        userWithEmail.dataValues.password
+      );
       if (!validPass)
         // return res.json({ message: "Email or password does not match!" })
-        throw { code: 400, message: "Email or password does not match!", err: null };
+        throw {
+          code: 400,
+          message: "Email or password does not match!",
+          err: null,
+        };
 
       delete userWithEmail.dataValues.password;
       let token = createToken(userWithEmail.dataValues);
-      res.status(200).send({ message: "Welcome back!", token, dataUser: userWithEmail.dataValues });
+      res.status(200).send({
+        message: "Welcome back!",
+        token,
+        dataUser: userWithEmail.dataValues,
+      });
     } catch (err) {
       res.status(err.code).send("Error Login: " + err.message);
     }
@@ -141,16 +171,24 @@ module.exports = {
       where: {
         id: req.user.id,
       },
+      include: [
+        {
+          model: User_Addresses,
+        },
+        {
+          model: Carts,
+          include: [{ model: Products, include: Warehouse_Products }],
+        },
+      ],
     });
-    res.status(200).send(user)
+    res.status(200).send(user);
   },
   forgotPassword: async (req, res) => {
     Users.sync({ alter: true });
     try {
-      let email = req.body.email
+      let email = req.body.email;
       const emailExist = await Users.findOne({ where: { email: email } });
       if (emailExist) {
-
         // // making token
         delete emailExist.dataValues.password;
         let token = createToken(emailExist.dataValues);
@@ -170,7 +208,7 @@ module.exports = {
           `,
         };
 
-        console.log(emailExist.dataValues)
+        console.log(emailExist.dataValues);
 
         // send mail
         transporter.sendMail(recoverpasswordmail, (errMail, resMail) => {
@@ -178,7 +216,10 @@ module.exports = {
             throw { code: 500, message: "Mail Failed!", err: null };
           }
         });
-        res.status(200).send({ message: "We have sent you a password recovery email.", success: true });
+        res.status(200).send({
+          message: "We have sent you a password recovery email.",
+          success: true,
+        });
       } else {
         throw {
           code: 500,
@@ -193,12 +234,12 @@ module.exports = {
   recoverPassword: async (req, res) => {
     // Users.sync({ alter: true });
     try {
-      console.log(req.user)
-      console.log(req.body)
+      console.log(req.user);
+      console.log(req.body);
 
       const saltRounds = 10;
       const hashedPassword = await bcrypt.hash(req.body.password, saltRounds);
-      console.log(hashedPassword)
+      console.log(hashedPassword);
       const updatePassword = await Users.update(
         {
           password: hashedPassword,

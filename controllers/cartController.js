@@ -16,7 +16,6 @@ module.exports = {
             model: Carts,
             include: [{ model: Products, include: Warehouse_Products }],
           },
-          // { model: Products, include: Warehouse_Products },
         ],
       });
       res.status(200).send(carts);
