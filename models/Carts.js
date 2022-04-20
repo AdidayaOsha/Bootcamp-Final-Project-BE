@@ -8,6 +8,9 @@ const Carts = sequelize.define("carts", {
     type: DataTypes.INTEGER,
     allowNull: false,
   },
+  subtotal: {
+    type: DataTypes.VIRTUAL,
+  },
 });
 
 module.exports = Carts;
