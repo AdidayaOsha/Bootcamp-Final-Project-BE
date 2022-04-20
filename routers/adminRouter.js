@@ -8,5 +8,7 @@ router.post("/register", adminController.register);
 router.patch("/verification", auth, adminController.verification);
 router.post("/login", adminController.login);
 router.post("/auth", auth, adminController.getDataAdmin);
+router.post("/forgotpassword", adminController.forgotPassword);
+router.patch("/recoverpassword", auth, adminController.recoverPassword);
 
 module.exports = router;
