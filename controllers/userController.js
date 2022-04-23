@@ -8,6 +8,9 @@ const Carts = require("../models/Carts");
 const Products = require("../models/Products");
 const Warehouse_Products = require("../models/Warehouse_Products");
 const User_Addresses = require("../models/User_Addresses");
+const Cities = require("../models/Cities");
+const Provinces = require("../models/Provinces");
+const Districts = require("../models/Districts");
 
 module.exports = {
   getUsers: async (req, res) => {
@@ -268,9 +271,29 @@ module.exports = {
         postal_code: req.body.postal_code,
         phone: req.body.phone,
         mobile: req.body.mobile,
+        userId: req.body.userId,
+        isDefault: req.body.isDefault,
       };
       const address = await User_Addresses.create(data);
       res.status(200).send(address);
+    } catch (err) {
+      console.log(err);
+      res.status(500).send(err);
+    }
+  },
+  getAddress: async (req, res) => {
+    Provinces.sync({ alter: true });
+    try {
+      console.log("hi");
+      let provinces = await Provinces.findAll({
+        include: [
+          {
+            model: Cities,
+            include: Districts,
+          },
+        ],
+      });
+      res.status(200).send(provinces);
     } catch (err) {
       console.log(err);
       res.status(500).send(err);
