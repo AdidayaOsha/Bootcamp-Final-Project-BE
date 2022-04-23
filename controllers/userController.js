@@ -281,7 +281,7 @@ module.exports = {
       res.status(500).send(err);
     }
   },
-  getAddress: async (req, res) => {
+  getProvinces: async (req, res) => {
     Provinces.sync({ alter: true });
     try {
       console.log("hi");
@@ -294,6 +294,42 @@ module.exports = {
         ],
       });
       res.status(200).send(provinces);
+    } catch (err) {
+      console.log(err);
+      res.status(500).send(err);
+    }
+  },
+  getCitiesByProvinceId: async (req, res) => {
+    // Cities.sync({ alter: true });
+    try {
+      let id = req.params.id
+    
+      let cities = await Provinces.findOne({ where: {id: id},
+        include: [
+          {
+            model: Cities
+          },
+        ],
+      });
+      res.status(200).send(cities);
+    } catch (err) {
+      console.log(err);
+      res.status(500).send(err);
+    }
+  },
+  getDistrictsByCityId: async (req, res) => {
+    // Cities.sync({ alter: true });
+    try {
+      let id = req.params.id
+    
+      let districts = await Cities.findOne({ where: {id: id},
+        include: [
+          {
+            model: Districts
+          },
+        ],
+      });
+      res.status(200).send(districts);
     } catch (err) {
       console.log(err);
       res.status(500).send(err);

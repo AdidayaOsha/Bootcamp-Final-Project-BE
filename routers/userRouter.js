@@ -4,7 +4,9 @@ const { auth } = require("../helper/authToken");
 
 router.get("/", userController.getUsers);
 router.get("/get/:id", userController.getUserById);
-router.get("/address", userController.getAddress);
+router.get("/provinces", userController.getProvinces);
+router.get("/cities/:id", userController.getCitiesByProvinceId);
+router.get("/districts/:id", userController.getDistrictsByCityId);
 router.post("/register", userController.register);
 router.patch("/verification", auth, userController.verification);
 router.post("/login", userController.login);
