@@ -5,6 +5,7 @@ const cartController = require("./cartController");
 const userController = require("./userController");
 const catalogController = require("./catalogController");
 const transactionController = require("./transactionController");
+const warehouseController = require("./warehouseController");
 
 module.exports = {
   adminController,
@@ -13,5 +14,5 @@ module.exports = {
   cartController,
   userController,
   catalogController,
-  transactionController,
-};
+  warehouseController,
+}

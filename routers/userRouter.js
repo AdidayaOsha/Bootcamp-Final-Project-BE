@@ -22,5 +22,6 @@ router.get("/getaddress/:id", userController.getAddressById);
 router.get("/getdefaultaddress", userController.getDefaultAddress);
 router.patch("/updatedefaultaddress", userController.updateDefaultAddress);
 router.delete("/deleteaddress/:id", userController.deleteUserAddress);
+router.patch("/update/:id", userController.updateStatus);
 
 module.exports = router;
