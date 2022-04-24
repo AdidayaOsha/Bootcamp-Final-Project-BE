@@ -4,6 +4,13 @@ const Users = require("../models/Users");
 const { createToken } = require("../helper/createToken");
 const transporter = require("../helper/nodemailer");
 const { hash } = require("bcrypt");
+const Carts = require("../models/Carts");
+const Products = require("../models/Products");
+const Warehouse_Products = require("../models/Warehouse_Products");
+const User_Addresses = require("../models/User_Addresses");
+const Cities = require("../models/Cities");
+const Provinces = require("../models/Provinces");
+const Districts = require("../models/Districts");
 
 module.exports = {
   getUsers: async (req, res) => {
@@ -88,7 +95,7 @@ module.exports = {
       });
       res.status(200).send(user);
     } catch (err) {
-      res.send(err);
+      res.status(err.code).send("Error Register: " + err.message);
     }
   },
   verification: async (req, res) => {
@@ -118,21 +125,47 @@ module.exports = {
     try {
       const { email, password } = req.body;
 
-      const userWithEmail = await Users.findOne({ where: { email } }).catch((err) => {
-        console.log(err)
-      })
+      const userWithEmail = await Users.findOne({
+        where: { email },
+        include: [
+          {
+            model: User_Addresses,
+          },
+          {
+            model: Carts,
+            include: [{ model: Products, include: Warehouse_Products }],
+          },
+        ],
+      }).catch((err) => {
+        console.log(err);
+      });
       if (!userWithEmail)
-        return res.json({ message: "Email or password does not match!" });
-      const validPass = await bcrypt.compare(password, userWithEmail.dataValues.password)
+        throw {
+          code: 400,
+          message: "Email or password does not match!",
+          err: null,
+        };
+      const validPass = await bcrypt.compare(
+        password,
+        userWithEmail.dataValues.password
+      );
       if (!validPass)
-        return res.json({ message: "Email or password does not match!" })
+        // return res.json({ message: "Email or password does not match!" })
+        throw {
+          code: 400,
+          message: "Email or password does not match!",
+          err: null,
+        };
 
       delete userWithEmail.dataValues.password;
       let token = createToken(userWithEmail.dataValues);
-      res.status(200).send({ message: "Welcome back!", token, dataUser: userWithEmail.dataValues });
-
+      res.status(200).send({
+        message: "Welcome back!",
+        token,
+        dataUser: userWithEmail.dataValues,
+      });
     } catch (err) {
-      res.send(err);
+      res.status(err.code).send("Error Login: " + err.message);
     }
   },
   getDataUser: async (req, res) => {
@@ -141,16 +174,24 @@ module.exports = {
       where: {
         id: req.user.id,
       },
+      include: [
+        {
+          model: User_Addresses,
+        },
+        {
+          model: Carts,
+          include: [{ model: Products, include: Warehouse_Products }],
+        },
+      ],
     });
-    res.status(200).send(user)
+    res.status(200).send(user);
   },
   forgotPassword: async (req, res) => {
     Users.sync({ alter: true });
     try {
-      let email = req.body.email
+      let email = req.body.email;
       const emailExist = await Users.findOne({ where: { email: email } });
       if (emailExist) {
-
         // // making token
         delete emailExist.dataValues.password;
         let token = createToken(emailExist.dataValues);
@@ -161,20 +202,27 @@ module.exports = {
           to: `${emailExist.dataValues.email}`,
           subject: `Account Password Recovery for ${emailExist.dataValues.full_name}`,
           html: `
-          <p>Username: ${emailExist.dataValues.username}</p>
-          <a href='http://localhost:3000/recoverpassword/${token}'>Click here to reset your Password.</a>
+          <p>Dear ${emailExist.dataValues.full_name},</p>
+          <p>You can reset the password for your account by using the information below:</p>
+          <p>Username: ${emailExist.dataValues.username}<br>
+          Email: ${emailExist.dataValues.email}<br>
+          Password reset link: <a href='http://localhost:3000/recoverpassword/${token}'>here</a></p>
+          -- Website Support --
           `,
         };
 
-        console.log(emailExist.dataValues)
+        console.log(emailExist.dataValues);
 
-        // // send mail
+        // send mail
         transporter.sendMail(recoverpasswordmail, (errMail, resMail) => {
           if (errMail) {
             throw { code: 500, message: "Mail Failed!", err: null };
           }
         });
-        res.status(200).send(user);
+        res.status(200).send({
+          message: "We have sent you a password recovery email.",
+          success: true,
+        });
       } else {
         throw {
           code: 500,
@@ -187,7 +235,105 @@ module.exports = {
     }
   },
   recoverPassword: async (req, res) => {
-    Users.sync({ alter: true });
+    // Users.sync({ alter: true });
+    try {
+      console.log(req.user);
+      console.log(req.body);
+
+      const saltRounds = 10;
+      const hashedPassword = await bcrypt.hash(req.body.password, saltRounds);
+      console.log(hashedPassword);
+      const updatePassword = await Users.update(
+        {
+          password: hashedPassword,
+        },
+        {
+          where: { id: req.user.id },
+        }
+      );
+      if (updatePassword[0] == 0) {
+        throw { code: 400, message: "Update Password Failed!", err: null };
+      }
+      res
+        .status(200)
+        .send({ message: "Password is Successfully Changed!", success: true });
+    } catch (err) {
+      res.status(err.code).send("Error Password Recovery: " + err.message);
+    }
+  },
+  addUserAddress: async (req, res) => {
+    try {
+      let data = {
+        address_line: req.body.address_line,
+        address_type: req.body.address_type,
+        city: req.body.city,
+        province: req.body.province,
+        postal_code: req.body.postal_code,
+        phone: req.body.phone,
+        mobile: req.body.mobile,
+        userId: req.body.userId,
+        isDefault: req.body.isDefault,
+      };
+      const address = await User_Addresses.create(data);
+      res.status(200).send(address);
+    } catch (err) {
+      console.log(err);
+      res.status(500).send(err);
+    }
+  },
+  getProvinces: async (req, res) => {
+    Provinces.sync({ alter: true });
+    try {
+      console.log("hi");
+      let provinces = await Provinces.findAll({
+        include: [
+          {
+            model: Cities,
+            include: Districts,
+          },
+        ],
+      });
+      res.status(200).send(provinces);
+    } catch (err) {
+      console.log(err);
+      res.status(500).send(err);
+    }
+  },
+  getCitiesByProvinceId: async (req, res) => {
+    // Cities.sync({ alter: true });
+    try {
+      let id = req.params.id
+    
+      let cities = await Provinces.findOne({ where: {id: id},
+        include: [
+          {
+            model: Cities
+          },
+        ],
+      });
+      res.status(200).send(cities);
+    } catch (err) {
+      console.log(err);
+      res.status(500).send(err);
+    }
+  },
+  getDistrictsByCityId: async (req, res) => {
+    // Cities.sync({ alter: true });
+    try {
+      let id = req.params.id
+    
+      let districts = await Cities.findOne({ where: {id: id},
+        include: [
+          {
+            model: Districts
+          },
+        ],
+      });
+      res.status(200).send(districts);
+    } catch (err) {
+      console.log(err);
+      res.status(500).send(err);
+    }
   },
   updateStatus: async (req, res) => {
     // Products.sync({ alter: true });

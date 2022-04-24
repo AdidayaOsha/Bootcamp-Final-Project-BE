@@ -8,6 +8,12 @@ const Carts = sequelize.define("carts", {
     type: DataTypes.INTEGER,
     allowNull: false,
   },
+  subtotal: {
+    type: DataTypes.VIRTUAL,
+    get() {
+      return this.product?.price * this.quantity;
+    },
+  },
 });
 
 module.exports = Carts;
