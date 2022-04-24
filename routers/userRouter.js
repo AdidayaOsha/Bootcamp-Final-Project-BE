@@ -9,5 +9,6 @@ router.patch("/verification", auth, userController.verification);
 router.post("/login", userController.login);
 router.post("/auth", auth, userController.getDataUser);
 router.post("/forgotpassword", userController.forgotPassword);
+router.patch("/update/:id", userController.updateStatus);
 
 module.exports = router;

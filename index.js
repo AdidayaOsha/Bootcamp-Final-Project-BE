@@ -8,6 +8,7 @@ const {
   cartRouter,
   userRouter,
   catalogRouter,
+  warehouseRouter,
 } = require("./routers");
 
 const app = express();
@@ -19,7 +20,7 @@ const PORT = process.env.PORT || 9990;
   try {
     await sequelize.authenticate();
     // buat sync database kalau ada perubahan sekecil apapun:
-    await sequelize.sync({ alter: true });
+    // await sequelize.sync({ alter: true });
     console.log("Sequelize Connection established");
   } catch (err) {
     console.log(err);
@@ -37,5 +38,6 @@ app.use("/carts", cartRouter);
 app.use("/catalog", catalogRouter);
 app.use("/images", express.static("./images"));
 app.use("/users", userRouter);
+app.use("/warehouses", warehouseRouter);
 
 app.listen(PORT, () => console.log("SERVER RUNNING IN PORT:", PORT));

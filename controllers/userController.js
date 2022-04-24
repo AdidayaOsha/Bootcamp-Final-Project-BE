@@ -189,4 +189,16 @@ module.exports = {
   recoverPassword: async (req, res) => {
     Users.sync({ alter: true });
   },
+  updateStatus: async (req, res) => {
+    // Products.sync({ alter: true });
+    try {
+      let id = req.params.id;
+      const users = await Users.update(req.body, {
+        where: { id: id },
+      });
+      res.status(200).send(users);
+    } catch (err) {
+      res.status(500).send(err);
+    }
+  },
 };
