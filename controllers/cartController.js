@@ -23,7 +23,25 @@ module.exports = {
       res.status(500).send(err);
     }
   },
-  updateUserCart: (req, res) => {},
+  updateCartQty: async (req, res) => {
+    try {
+      let id = req.params.id;
+      let { userId } = req.body;
+      const carts = await Carts.update(req.body, { where: { id: id } });
+      const getUserCart = await Carts.findAll({
+        where: { userId },
+        include: [
+          {
+            model: Products,
+            include: [{ model: Warehouse_Products }],
+          },
+        ],
+      });
+      res.status(200).send({ carts, getUserCart });
+    } catch (err) {
+      res.status(500).send(err);
+    }
+  },
   addUserCart: async (req, res) => {
     Carts.sync({ alter: true });
     try {
