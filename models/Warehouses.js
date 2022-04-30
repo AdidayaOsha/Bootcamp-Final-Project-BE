@@ -1,7 +1,6 @@
 const sequelize = require("../lib/sequelize");
 const { DataTypes } = require("sequelize");
-const Warehouse_Products = require("./Warehouse_Products");
-const Products = require("./Products");
+const Invoice_Headers = require("./Invoice_Headers");
 
 const Warehouses = sequelize.define(
   "warehouses",
@@ -37,3 +36,6 @@ const Warehouses = sequelize.define(
 );
 
 module.exports = Warehouses;
+
+Warehouses.hasOne(Invoice_Headers);
+Invoice_Headers.belongsTo(Warehouses);

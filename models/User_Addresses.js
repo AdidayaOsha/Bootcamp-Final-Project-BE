@@ -1,6 +1,5 @@
 const sequelize = require("../lib/sequelize");
 const { DataTypes } = require("sequelize");
-const Users = require("./Users");
 
 const User_Addresses = sequelize.define("user_addresses", {
   address_line: {
