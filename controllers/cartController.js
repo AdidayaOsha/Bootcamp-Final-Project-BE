@@ -58,5 +58,5 @@ module.exports = {
     }
     console.log(req.file);
   },
-  deleteUserCart: (req, res) => {},
+  deleteUserCart: (req, res) => { },
 };

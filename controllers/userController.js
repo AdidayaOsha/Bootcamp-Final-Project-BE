@@ -235,7 +235,7 @@ module.exports = {
     }
   },
   recoverPassword: async (req, res) => {
-    // Users.sync({ alter: true });
+    Users.sync({ alter: true });
     try {
       console.log(req.user);
       console.log(req.body);
