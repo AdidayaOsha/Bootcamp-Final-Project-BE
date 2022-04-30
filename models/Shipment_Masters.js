@@ -1,11 +1,11 @@
 const sequelize = require("../lib/sequelize");
 const { DataTypes } = require("sequelize");
 
-const Shipment_Master = sequelize.define("shipment_master", {
+const Shipment_Masters = sequelize.define("shipment_masters", {
   name: {
     type: DataTypes.STRING,
     allowNull: true,
   },
 });
 
-module.exports = Shipment_Master;
+module.exports = Shipment_Masters;
