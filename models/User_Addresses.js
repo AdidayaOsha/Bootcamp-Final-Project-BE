@@ -10,11 +10,15 @@ const User_Addresses = sequelize.define("user_addresses", {
     type: DataTypes.STRING,
     allowNull: true,
   },
+  province: {
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
   city: {
     type: DataTypes.STRING,
     allowNull: true,
   },
-  province: {
+  district: {
     type: DataTypes.STRING,
     allowNull: true,
   },
