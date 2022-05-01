@@ -266,8 +266,9 @@ module.exports = {
       let data = {
         address_line: req.body.address_line,
         address_type: req.body.address_type,
-        city: req.body.city,
         province: req.body.province,
+        city: req.body.city,
+        district: req.body.district,
         postal_code: req.body.postal_code,
         phone: req.body.phone,
         mobile: req.body.mobile,
@@ -302,12 +303,13 @@ module.exports = {
   getCitiesByProvinceId: async (req, res) => {
     // Cities.sync({ alter: true });
     try {
-      let id = req.params.id
-    
-      let cities = await Provinces.findOne({ where: {id: id},
+      let id = req.params.id;
+
+      let cities = await Provinces.findOne({
+        where: { id: id },
         include: [
           {
-            model: Cities
+            model: Cities,
           },
         ],
       });
@@ -320,18 +322,33 @@ module.exports = {
   getDistrictsByCityId: async (req, res) => {
     // Cities.sync({ alter: true });
     try {
-      let id = req.params.id
-    
-      let districts = await Cities.findOne({ where: {id: id},
+      let id = req.params.id;
+
+      let districts = await Cities.findOne({
+        where: { id: id },
         include: [
           {
-            model: Districts
+            model: Districts,
           },
         ],
       });
       res.status(200).send(districts);
     } catch (err) {
       console.log(err);
+      res.status(500).send(err);
+    }
+  },
+  getAddressById: async (req, res) => {
+    User_Addresses.sync({ alter: true });
+    try {
+      let id = req.params.id;
+      let user = await User_Addresses.findOne({
+        where: {
+          id: id,
+        },
+      });
+      res.status(200).send(user);
+    } catch (err) {
       res.status(500).send(err);
     }
   },
