@@ -25,5 +25,6 @@ router.delete("/deleteaddress/:id", userController.deleteUserAddress);
 router.patch("/update/:id", userController.updateStatus);
 router.patch("/recoverpassword", auth, userController.recoverPassword);
 router.post("/newaddress", userController.addUserAddress);
+router.post("/search", userController.searchUser);
 
 module.exports = router;
