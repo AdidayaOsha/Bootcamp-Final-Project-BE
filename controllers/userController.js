@@ -347,4 +347,20 @@ module.exports = {
       res.status(500).send(err);
     }
   },
+  searchUser: async (req, res) => {
+    // Users.sync({ alter: true });
+    try {
+      let users = await Users.findAll({
+        where: {
+          username: {
+            [Op.substring]: req.body.username,
+          },
+        },
+      });
+      res.status(200).send(users);
+    } catch (err) {
+      res.status(500).send(err);
+      console.log(err);
+    }
+  },
 };

@@ -18,4 +18,4 @@ const Warehouse_Products = sequelize.define("warehouse_products", {
 module.exports = Warehouse_Products;
 
 Warehouses.hasMany(Warehouse_Products);
-// Warehouse_Products.belongsTo(Warehouses);
+Warehouse_Products.belongsTo(Warehouses);

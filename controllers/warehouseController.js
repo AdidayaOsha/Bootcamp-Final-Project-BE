@@ -29,7 +29,7 @@ module.exports = {
     }
   },
   addWarehouse: async (req, res) => {
-    // Warehouses.sync({ alter: true });
+    Warehouses.sync({ alter: true });
     try {
       let data = {
         name: req.body.name,
