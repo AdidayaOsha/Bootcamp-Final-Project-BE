@@ -15,5 +15,6 @@ router.post("/forgotpassword", userController.forgotPassword);
 router.patch("/recoverpassword", auth, userController.recoverPassword);
 router.post("/newaddress", userController.addUserAddress);
 router.get("/getaddress/:id", userController.getAddressById);
+router.get("/getdefaultaddress", userController.getDefaultAddress);
 
 module.exports = router;

@@ -338,6 +338,20 @@ module.exports = {
       res.status(500).send(err);
     }
   },
+  getDefaultAddress: async (req, res) => {
+    User_Addresses.sync({ alter: true });
+    try {
+      const defaultAddress = await User_Addresses.findOne({
+        where: {
+          isDefault: true,
+        },
+      });
+      res.status(200).send(defaultAddress);
+    } catch (err) {
+      res.status(500).send(err);
+      console.log(err);
+    }
+  },
   getAddressById: async (req, res) => {
     User_Addresses.sync({ alter: true });
     try {
