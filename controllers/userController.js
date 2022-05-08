@@ -130,6 +130,12 @@ module.exports = {
         include: [
           {
             model: User_Addresses,
+            include: [
+              {
+                model: Provinces,
+                include: Cities,
+              },
+            ],
           },
           {
             model: Carts,
@@ -177,6 +183,12 @@ module.exports = {
       include: [
         {
           model: User_Addresses,
+          include: [
+            {
+              model: Provinces,
+              include: Cities,
+            },
+          ],
         },
         {
           model: Carts,
@@ -342,6 +354,20 @@ module.exports = {
     User_Addresses.sync({ alter: true });
     try {
       const defaultAddress = await User_Addresses.findOne({
+        where: {
+          isDefault: true,
+        },
+      });
+      res.status(200).send(defaultAddress);
+    } catch (err) {
+      res.status(500).send(err);
+      console.log(err);
+    }
+  },
+  updateDefaultAddress: async (req, res) => {
+    User_Addresses.sync({ alter: true });
+    try {
+      const defaultAddress = await User_Addresses.update(req.body, {
         where: {
           isDefault: true,
         },
