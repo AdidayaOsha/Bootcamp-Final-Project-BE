@@ -1,5 +1,6 @@
 const db = require("../db");
 const Carts = require("../models/Carts");
+const Payment_Options = require("../models/Payment_Options");
 const Products = require("../models/Products");
 const Shipment_Masters = require("../models/Shipment_Masters");
 const Users = require("../models/Users");
@@ -65,6 +66,16 @@ module.exports = {
     try {
       const shipments = await Shipment_Masters.findAll({});
       res.status(200).send(shipments);
+    } catch (err) {
+      console.log(err);
+      res.status(500).send(err);
+    }
+  },
+  getPaymentOptions: async (req, res) => {
+    Payment_Options.sync({ alter: true });
+    try {
+      const payment = await Payment_Options.findAll({});
+      res.status(200).send(payment);
     } catch (err) {
       console.log(err);
       res.status(500).send(err);

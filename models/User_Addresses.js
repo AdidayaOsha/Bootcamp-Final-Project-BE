@@ -1,8 +1,5 @@
 const sequelize = require("../lib/sequelize");
 const { DataTypes } = require("sequelize");
-const Provinces = require("./Provinces");
-const Cities = require("./Cities");
-const Districts = require("./Districts");
 
 const User_Addresses = sequelize.define("user_addresses", {
   address_line: {
@@ -13,16 +10,28 @@ const User_Addresses = sequelize.define("user_addresses", {
     type: DataTypes.STRING,
     allowNull: true,
   },
+  province: {
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
+  city: {
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
+  district: {
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
   postal_code: {
     type: DataTypes.INTEGER,
     allowNull: true,
   },
   phone: {
-    type: DataTypes.INTEGER,
+    type: DataTypes.STRING,
     allowNull: true,
   },
   mobile: {
-    type: DataTypes.INTEGER,
+    type: DataTypes.STRING,
     allowNull: true,
   },
   isDefault: {
@@ -32,12 +41,3 @@ const User_Addresses = sequelize.define("user_addresses", {
 });
 
 module.exports = User_Addresses;
-
-Provinces.hasOne(User_Addresses);
-User_Addresses.belongsTo(Provinces);
-
-Cities.hasOne(User_Addresses);
-User_Addresses.belongsTo(Cities);
-
-Districts.hasOne(User_Addresses);
-User_Addresses.belongsTo(Districts);

@@ -177,12 +177,6 @@ module.exports = {
       include: [
         {
           model: User_Addresses,
-          include: [
-            {
-              model: Provinces,
-              include: Cities,
-            },
-          ],
         },
         {
           model: Carts,
@@ -288,6 +282,7 @@ module.exports = {
       res.status(500).send(err);
     }
   },
+
   getProvinces: async (req, res) => {
     Provinces.sync({ alter: true });
     try {
@@ -301,6 +296,46 @@ module.exports = {
         ],
       });
       res.status(200).send(provinces);
+    } catch (err) {
+      console.log(err);
+      res.status(500).send(err);
+    }
+  },
+  getProvince: async (req, res) => {
+    try {
+      let id = req.params.id;
+      let province = await Provinces.findOne({
+        where: { id: id },
+      });
+      res.status(200).send(province);
+    } catch (err) {
+      console.log();
+      res.status(500).send(err);
+    }
+  },
+  getCity: async (req, res) => {
+    // Cities.sync({ alter: true });
+    try {
+      let id = req.params.id;
+
+      let city = await Cities.findOne({
+        where: { id: id },
+      });
+      res.status(200).send(city);
+    } catch (err) {
+      console.log(err);
+      res.status(500).send(err);
+    }
+  },
+  getDistrict: async (req, res) => {
+    // Districts.sync({ alter: true });
+    try {
+      let id = req.params.id;
+
+      let district = await Districts.findOne({
+        where: { id: id },
+      });
+      res.status(200).send(district);
     } catch (err) {
       console.log(err);
       res.status(500).send(err);
