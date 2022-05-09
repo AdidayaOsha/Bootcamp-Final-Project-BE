@@ -27,11 +27,11 @@ const User_Addresses = sequelize.define("user_addresses", {
     allowNull: true,
   },
   phone: {
-    type: DataTypes.INTEGER,
+    type: DataTypes.STRING,
     allowNull: true,
   },
   mobile: {
-    type: DataTypes.INTEGER,
+    type: DataTypes.STRING,
     allowNull: true,
   },
   isDefault: {

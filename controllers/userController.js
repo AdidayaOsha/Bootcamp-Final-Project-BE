@@ -282,6 +282,7 @@ module.exports = {
       res.status(500).send(err);
     }
   },
+
   getProvinces: async (req, res) => {
     Provinces.sync({ alter: true });
     try {
@@ -295,6 +296,46 @@ module.exports = {
         ],
       });
       res.status(200).send(provinces);
+    } catch (err) {
+      console.log(err);
+      res.status(500).send(err);
+    }
+  },
+  getProvince: async (req, res) => {
+    try {
+      let id = req.params.id;
+      let province = await Provinces.findOne({
+        where: { id: id },
+      });
+      res.status(200).send(province);
+    } catch (err) {
+      console.log();
+      res.status(500).send(err);
+    }
+  },
+  getCity: async (req, res) => {
+    // Cities.sync({ alter: true });
+    try {
+      let id = req.params.id;
+
+      let city = await Cities.findOne({
+        where: { id: id },
+      });
+      res.status(200).send(city);
+    } catch (err) {
+      console.log(err);
+      res.status(500).send(err);
+    }
+  },
+  getDistrict: async (req, res) => {
+    // Districts.sync({ alter: true });
+    try {
+      let id = req.params.id;
+
+      let district = await Districts.findOne({
+        where: { id: id },
+      });
+      res.status(200).send(district);
     } catch (err) {
       console.log(err);
       res.status(500).send(err);
@@ -336,6 +377,34 @@ module.exports = {
     } catch (err) {
       console.log(err);
       res.status(500).send(err);
+    }
+  },
+  getDefaultAddress: async (req, res) => {
+    User_Addresses.sync({ alter: true });
+    try {
+      const defaultAddress = await User_Addresses.findOne({
+        where: {
+          isDefault: true,
+        },
+      });
+      res.status(200).send(defaultAddress);
+    } catch (err) {
+      res.status(500).send(err);
+      console.log(err);
+    }
+  },
+  updateDefaultAddress: async (req, res) => {
+    User_Addresses.sync({ alter: true });
+    try {
+      const defaultAddress = await User_Addresses.update(req.body, {
+        where: {
+          isDefault: true,
+        },
+      });
+      res.status(200).send(defaultAddress);
+    } catch (err) {
+      res.status(500).send(err);
+      console.log(err);
     }
   },
   getAddressById: async (req, res) => {

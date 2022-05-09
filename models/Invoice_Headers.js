@@ -5,6 +5,7 @@ const Payment_Confirmations = require("./Payment_Confirmations");
 const Shipment_Masters = require("./Shipment_Masters");
 const Invoice_Details = require("./Invoice_Details");
 const Users = require("./Users");
+const Payment_Options = require("./Payment_Options");
 
 const Invoice_Headers = sequelize.define("invoice_headers", {
   total: {
@@ -30,6 +31,9 @@ Invoice_Headers.belongsTo(User_Addresses);
 
 Shipment_Masters.hasOne(Invoice_Headers);
 Invoice_Headers.belongsTo(Shipment_Masters);
+
+Payment_Options.hasOne(Invoice_Headers);
+Invoice_Headers.belongsTo(Payment_Options);
 
 Payment_Confirmations.hasOne(Invoice_Headers);
 Invoice_Headers.belongsTo(Payment_Confirmations);
