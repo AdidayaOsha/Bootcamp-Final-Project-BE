@@ -170,21 +170,26 @@ module.exports = {
   },
   getDataUser: async (req, res) => {
     Users.sync({ alter: true });
-    let user = await Users.findOne({
-      where: {
-        id: req.user.id,
-      },
-      include: [
-        {
-          model: User_Addresses,
+    try {
+      let user = await Users.findOne({
+        where: {
+          id: req.user.id,
         },
-        {
-          model: Carts,
-          include: [{ model: Products, include: Warehouse_Products }],
-        },
-      ],
-    });
-    res.status(200).send(user);
+        include: [
+          {
+            model: User_Addresses,
+          },
+          {
+            model: Carts,
+            include: [{ model: Products, include: Warehouse_Products }],
+          },
+        ],
+      });
+      res.status(200).send(user);
+    } catch (err) {
+      console.log(err)
+      res.status(err.code).send("Error Keep Login: " + err.message);
+    }
   },
   forgotPassword: async (req, res) => {
     Users.sync({ alter: true });
@@ -235,7 +240,7 @@ module.exports = {
     }
   },
   recoverPassword: async (req, res) => {
-    // Users.sync({ alter: true });
+    Users.sync({ alter: true });
     try {
       console.log(req.user);
       console.log(req.body);

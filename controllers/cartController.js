@@ -60,6 +60,7 @@ module.exports = {
     }
     console.log(req.file);
   },
+
   deleteUserCart: (req, res) => {},
   getShipments: async (req, res) => {
     Shipment_Masters.sync({ alter: true });
