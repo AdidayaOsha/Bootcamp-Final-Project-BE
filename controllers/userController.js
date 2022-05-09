@@ -130,12 +130,6 @@ module.exports = {
         include: [
           {
             model: User_Addresses,
-            include: [
-              {
-                model: Provinces,
-                include: Cities,
-              },
-            ],
           },
           {
             model: Carts,

@@ -1,6 +1,7 @@
 const db = require("../db");
 const Carts = require("../models/Carts");
 const Products = require("../models/Products");
+const Shipment_Masters = require("../models/Shipment_Masters");
 const Users = require("../models/Users");
 const Warehouse_Products = require("../models/Warehouse_Products");
 
@@ -59,4 +60,14 @@ module.exports = {
     console.log(req.file);
   },
   deleteUserCart: (req, res) => {},
+  getShipments: async (req, res) => {
+    Shipment_Masters.sync({ alter: true });
+    try {
+      const shipments = await Shipment_Masters.findAll({});
+      res.status(200).send(shipments);
+    } catch (err) {
+      console.log(err);
+      res.status(500).send(err);
+    }
+  },
 };
