@@ -1,11 +1,13 @@
 const sequelize = require("../lib/sequelize");
 const { DataTypes } = require("sequelize");
+const User_Addresses = require("./User_Addresses");
+const Payment_Confirmations = require("./Payment_Confirmations");
+const Shipment_Masters = require("./Shipment_Masters");
+const Invoice_Details = require("./Invoice_Details");
 const Users = require("./Users");
-const User_Address = require("./User_Address");
-const Shipment_Master = require("./Shipment_Master");
-const Warehouse = require("./Warehouse");
+const Payment_Options = require("./Payment_Options");
 
-const Invoice_Header = sequelize.define("invoice_header", {
+const Invoice_Headers = sequelize.define("invoice_headers", {
   total: {
     type: DataTypes.DECIMAL,
   },
@@ -22,16 +24,22 @@ const Invoice_Header = sequelize.define("invoice_header", {
   },
 });
 
-module.exports = Invoice_Header;
+module.exports = Invoice_Headers;
 
-Invoice_Header.hasOne(Users);
-Users.belongsTo(Invoice_Header);
+User_Addresses.hasOne(Invoice_Headers);
+Invoice_Headers.belongsTo(User_Addresses);
 
-Invoice_Header.hasMany(User_Address);
-User_Address.belongsTo(Invoice_Header);
+Shipment_Masters.hasOne(Invoice_Headers);
+Invoice_Headers.belongsTo(Shipment_Masters);
 
-Invoice_Header.hasOne(Shipment_Master);
-Shipment_Master.belongsTo(Invoice_Header);
+Payment_Options.hasOne(Invoice_Headers);
+Invoice_Headers.belongsTo(Payment_Options);
 
-Invoice_Header.hasOne(Warehouse);
-Warehouse.belongsTo(Invoice_Header);
+Payment_Confirmations.hasOne(Invoice_Headers);
+Invoice_Headers.belongsTo(Payment_Confirmations);
+
+Invoice_Headers.hasMany(Invoice_Details);
+Invoice_Details.belongsTo(Invoice_Headers);
+
+Users.hasMany(Invoice_Headers);
+Invoice_Headers.belongsTo(Users);
