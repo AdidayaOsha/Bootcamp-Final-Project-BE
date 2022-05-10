@@ -170,21 +170,26 @@ module.exports = {
   },
   getDataUser: async (req, res) => {
     Users.sync({ alter: true });
-    let user = await Users.findOne({
-      where: {
-        id: req.user.id,
-      },
-      include: [
-        {
-          model: User_Addresses,
+    try {
+      let user = await Users.findOne({
+        where: {
+          id: req.user.id,
         },
-        {
-          model: Carts,
-          include: [{ model: Products, include: Warehouse_Products }],
-        },
-      ],
-    });
-    res.status(200).send(user);
+        include: [
+          {
+            model: User_Addresses,
+          },
+          {
+            model: Carts,
+            include: [{ model: Products, include: Warehouse_Products }],
+          },
+        ],
+      });
+      res.status(200).send(user);
+    } catch (err) {
+      console.log(err)
+      res.status(err.code).send("Error Keep Login: " + err.message);
+    }
   },
   forgotPassword: async (req, res) => {
     Users.sync({ alter: true });
@@ -235,7 +240,7 @@ module.exports = {
     }
   },
   recoverPassword: async (req, res) => {
-    // Users.sync({ alter: true });
+    Users.sync({ alter: true });
     try {
       console.log(req.user);
       console.log(req.body);
@@ -261,13 +266,28 @@ module.exports = {
       res.status(err.code).send("Error Password Recovery: " + err.message);
     }
   },
+  getAddressesByUserId: async (req, res) => {
+    User_Addresses.sync({ alter: true });
+    try {
+      let id = req.params.id;
+      let addresses = await User_Addresses.findAll({
+        where: {
+          userId: id,
+        },
+      });
+      res.status(200).send(addresses);
+    } catch (err) {
+      res.status(500).send(err);
+    }
+  },
   addUserAddress: async (req, res) => {
     try {
       let data = {
         address_line: req.body.address_line,
         address_type: req.body.address_type,
-        city: req.body.city,
         province: req.body.province,
+        city: req.body.city,
+        district: req.body.district,
         postal_code: req.body.postal_code,
         phone: req.body.phone,
         mobile: req.body.mobile,
@@ -299,15 +319,56 @@ module.exports = {
       res.status(500).send(err);
     }
   },
+  getProvince: async (req, res) => {
+    try {
+      let id = req.params.id;
+      let province = await Provinces.findOne({
+        where: { id: id },
+      });
+      res.status(200).send(province);
+    } catch (err) {
+      console.log();
+      res.status(500).send(err);
+    }
+  },
+  getCity: async (req, res) => {
+    // Cities.sync({ alter: true });
+    try {
+      let id = req.params.id;
+
+      let city = await Cities.findOne({
+        where: { id: id },
+      });
+      res.status(200).send(city);
+    } catch (err) {
+      console.log(err);
+      res.status(500).send(err);
+    }
+  },
+  getDistrict: async (req, res) => {
+    // Districts.sync({ alter: true });
+    try {
+      let id = req.params.id;
+
+      let district = await Districts.findOne({
+        where: { id: id },
+      });
+      res.status(200).send(district);
+    } catch (err) {
+      console.log(err);
+      res.status(500).send(err);
+    }
+  },
   getCitiesByProvinceId: async (req, res) => {
     // Cities.sync({ alter: true });
     try {
-      let id = req.params.id
-    
-      let cities = await Provinces.findOne({ where: {id: id},
+      let id = req.params.id;
+
+      let cities = await Provinces.findOne({
+        where: { id: id },
         include: [
           {
-            model: Cities
+            model: Cities,
           },
         ],
       });
@@ -320,12 +381,13 @@ module.exports = {
   getDistrictsByCityId: async (req, res) => {
     // Cities.sync({ alter: true });
     try {
-      let id = req.params.id
-    
-      let districts = await Cities.findOne({ where: {id: id},
+      let id = req.params.id;
+
+      let districts = await Cities.findOne({
+        where: { id: id },
         include: [
           {
-            model: Districts
+            model: Districts,
           },
         ],
       });
@@ -361,6 +423,62 @@ module.exports = {
     } catch (err) {
       res.status(500).send(err);
       console.log(err);
+    }
+  },
+  getDefaultAddress: async (req, res) => {
+    User_Addresses.sync({ alter: true });
+    try {
+      const defaultAddress = await User_Addresses.findOne({
+        where: {
+          isDefault: true,
+        },
+      });
+      res.status(200).send(defaultAddress);
+    } catch (err) {
+      res.status(500).send(err);
+      console.log(err);
+    }
+  },
+  updateDefaultAddress: async (req, res) => {
+    User_Addresses.sync({ alter: true });
+    try {
+      const defaultAddress = await User_Addresses.update(req.body, {
+        where: {
+          isDefault: true,
+        },
+      });
+      res.status(200).send(defaultAddress);
+    } catch (err) {
+      res.status(500).send(err);
+      console.log(err);
+    }
+  },
+  getAddressById: async (req, res) => {
+    User_Addresses.sync({ alter: true });
+    try {
+      let id = req.params.id;
+      let user = await User_Addresses.findOne({
+        where: {
+          id: id,
+        },
+      });
+      res.status(200).send(user);
+    } catch (err) {
+      res.status(500).send(err);
+    }
+  },
+  deleteUserAddress: async (req, res) => {
+    try {
+      let id = req.params.id;
+      // let { userId } = req.body;
+      await User_Addresses.destroy({ where: { id: id } });
+      // const getUserAddress = await User_Addresses.findAll({
+      //   where: { userId },
+      // });
+      res.status(200).send("User Address Deleted");
+    } catch (err) {
+      console.log(err);
+      res.status(500).send(err);
     }
   },
 };

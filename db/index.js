@@ -4,8 +4,8 @@ const db = mysql.createConnection({
   hostname: "localhost",
   user: "root",
   // masukkin password MySql kalian
-  password: "passwordSONYA",
-  database: "tesbootcamp",
+  password: "mantan123",
+  database: "bootcamp_group_1",
   port: 3306,
   multipleStatements: true,
 });

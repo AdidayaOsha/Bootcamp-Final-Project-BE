@@ -1,5 +1,6 @@
 const express = require("express");
 const cors = require("cors");
+const cookieParser = require("cookie-parser");
 const sequelize = require("./lib/sequelize");
 const {
   adminRouter,
@@ -9,11 +10,13 @@ const {
   userRouter,
   catalogRouter,
   warehouseRouter,
+  transactionRouter,
 } = require("./routers");
 
 const app = express();
 app.use(cors());
 app.use(express.json());
+app.use(cookieParser());
 const PORT = process.env.PORT || 9990;
 
 (async () => {
@@ -39,5 +42,6 @@ app.use("/catalog", catalogRouter);
 app.use("/images", express.static("./images"));
 app.use("/users", userRouter);
 app.use("/warehouses", warehouseRouter);
+app.use("/transactions", transactionRouter);
 
 app.listen(PORT, () => console.log("SERVER RUNNING IN PORT:", PORT));
