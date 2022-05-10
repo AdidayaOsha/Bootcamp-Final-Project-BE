@@ -17,8 +17,10 @@ router.post("/auth", auth, userController.getDataUser);
 router.post("/forgotpassword", userController.forgotPassword);
 router.patch("/recoverpassword", auth, userController.recoverPassword);
 router.post("/newaddress", userController.addUserAddress);
+router.get("/getaddresses/:id", userController.getAddressesByUserId);
 router.get("/getaddress/:id", userController.getAddressById);
 router.get("/getdefaultaddress", userController.getDefaultAddress);
 router.patch("/updatedefaultaddress", userController.updateDefaultAddress);
+router.delete("/deleteaddress/:id", userController.deleteUserAddress);
 
 module.exports = router;

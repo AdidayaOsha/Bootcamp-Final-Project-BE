@@ -266,6 +266,20 @@ module.exports = {
       res.status(err.code).send("Error Password Recovery: " + err.message);
     }
   },
+  getAddressesByUserId: async (req, res) => {
+    User_Addresses.sync({ alter: true });
+    try {
+      let id = req.params.id;
+      let addresses = await User_Addresses.findAll({
+        where: {
+          userId: id,
+        },
+      });
+      res.status(200).send(addresses);
+    } catch (err) {
+      res.status(500).send(err);
+    }
+  },
   addUserAddress: async (req, res) => {
     try {
       let data = {
@@ -287,7 +301,6 @@ module.exports = {
       res.status(500).send(err);
     }
   },
-
   getProvinces: async (req, res) => {
     Provinces.sync({ alter: true });
     try {
@@ -423,6 +436,20 @@ module.exports = {
       });
       res.status(200).send(user);
     } catch (err) {
+      res.status(500).send(err);
+    }
+  },
+  deleteUserAddress: async (req, res) => {
+    try {
+      let id = req.params.id;
+      // let { userId } = req.body;
+      await User_Addresses.destroy({ where: { id: id } });
+      // const getUserAddress = await User_Addresses.findAll({
+      //   where: { userId },
+      // });
+      res.status(200).send("User Address Deleted");
+    } catch (err) {
+      console.log(err);
       res.status(500).send(err);
     }
   },
