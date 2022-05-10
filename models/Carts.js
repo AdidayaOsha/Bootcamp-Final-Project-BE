@@ -3,17 +3,29 @@ const { DataTypes } = require("sequelize");
 const Products = require("./Products");
 const Users = require("./Users");
 
-const Cart = sequelize.define("cart", {
-  quantity: {
-    type: DataTypes.INTEGER,
-    allowNull: false,
+const Carts = sequelize.define(
+  "carts",
+  {
+    quantity: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
+    subtotal: {
+      type: DataTypes.VIRTUAL,
+      get() {
+        return this.product?.price * this.quantity;
+      },
+    },
   },
-});
+  {
+    paranoid: true,
+  }
+);
 
-module.exports = Cart;
+module.exports = Carts;
 
-Cart.hasMany(Products);
-Products.belongsTo(Cart);
+Products.hasMany(Carts);
+Carts.belongsTo(Products);
 
-Cart.hasOne(Users);
-Users.belongsTo(Cart);
+Users.hasMany(Carts);
+Carts.belongsTo(Users);

@@ -2,6 +2,7 @@ const sequelize = require("../lib/sequelize");
 const { DataTypes } = require("sequelize");
 const Product_Categories = require("./Product_Categories");
 const Warehouse_Products = require("./Warehouse_Products");
+const Invoice_Details = require("./Invoice_Details");
 
 const Products = sequelize.define(
   "products",
@@ -13,12 +14,12 @@ const Products = sequelize.define(
     },
     name: {
       type: DataTypes.STRING,
-      defaultValue: "example of the File Name",
-      allowNull: false,
+      defaultValue: "",
+      allowNull: true,
     },
     description: {
       type: DataTypes.STRING,
-      allowNull: false,
+      allowNull: true,
     },
     price: {
       type: DataTypes.INTEGER,
@@ -28,11 +29,6 @@ const Products = sequelize.define(
           msg: "Only numbers is allowed",
         },
       },
-    },
-    is_deleted: {
-      type: DataTypes.BOOLEAN,
-      defaultValue: false,
-      allowNull: true,
     },
   },
   {
@@ -45,5 +41,8 @@ module.exports = Products;
 Product_Categories.hasMany(Products);
 Products.belongsTo(Product_Categories);
 
-Products.hasOne(Warehouse_Products);
+Products.hasMany(Warehouse_Products);
 Warehouse_Products.belongsTo(Products);
+
+Products.hasMany(Invoice_Details);
+Invoice_Details.belongsTo(Products);
