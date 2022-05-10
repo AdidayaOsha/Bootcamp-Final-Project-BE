@@ -63,6 +63,7 @@ module.exports = {
     console.log(req.file);
   },
   deleteUserCart: async (req, res) => {
+    Carts.sync({ alter: true });
     try {
       let id = req.params.id;
       let { userId } = req.body;
