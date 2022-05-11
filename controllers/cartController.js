@@ -7,6 +7,7 @@ const Products = require("../models/Products");
 const Shipment_Masters = require("../models/Shipment_Masters");
 const Users = require("../models/Users");
 const Warehouse_Products = require("../models/Warehouse_Products");
+const Payment_Confirmations = require("../models/Payment_Confirmations");
 
 module.exports = {
   getUserCart: async (req, res) => {
@@ -153,5 +154,20 @@ module.exports = {
       console.log(err);
       res.status(500).send(err);
     }
+  },
+  addPaymentProof: async (req, res) => {
+    // Products.sync({ alter: true });
+    try {
+      let data = {
+        //use file to upload only a single image, not files.
+        payment_proof: req.file.path,
+      };
+      const paymentproof = await Payment_Confirmations.create(data);
+      res.status(200).send(paymentproof);
+    } catch (err) {
+      console.log(err);
+      res.status(500).send(err);
+    }
+    console.log(req.file);
   },
 };
