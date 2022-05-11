@@ -4,7 +4,6 @@ const productController = require("./productController");
 const cartController = require("./cartController");
 const userController = require("./userController");
 const catalogController = require("./catalogController");
-const transactionController = require("./transactionController");
 const warehouseController = require("./warehouseController");
 const transactionController = require("./transactionController");
 
