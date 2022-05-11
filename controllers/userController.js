@@ -453,4 +453,88 @@ module.exports = {
       res.status(500).send(err);
     }
   },
+  updateStatus: async (req, res) => {
+    // Products.sync({ alter: true });
+    try {
+      let id = req.params.id;
+      const users = await Users.update(req.body, {
+        where: { id: id },
+      });
+      res.status(200).send(users);
+    } catch (err) {
+      res.status(500).send(err);
+    }
+  },
+  searchUser: async (req, res) => {
+    // Users.sync({ alter: true });
+    try {
+      let users = await Users.findAll({
+        where: {
+          username: {
+            [Op.substring]: req.body.username,
+          },
+        },
+      });
+      res.status(200).send(users);
+    } catch (err) {
+      res.status(500).send(err);
+      console.log(err);
+    }
+  },
+  getDefaultAddress: async (req, res) => {
+    User_Addresses.sync({ alter: true });
+    try {
+      const defaultAddress = await User_Addresses.findOne({
+        where: {
+          isDefault: true,
+        },
+      });
+      res.status(200).send(defaultAddress);
+    } catch (err) {
+      res.status(500).send(err);
+      console.log(err);
+    }
+  },
+  updateDefaultAddress: async (req, res) => {
+    User_Addresses.sync({ alter: true });
+    try {
+      const defaultAddress = await User_Addresses.update(req.body, {
+        where: {
+          isDefault: true,
+        },
+      });
+      res.status(200).send(defaultAddress);
+    } catch (err) {
+      res.status(500).send(err);
+      console.log(err);
+    }
+  },
+  getAddressById: async (req, res) => {
+    User_Addresses.sync({ alter: true });
+    try {
+      let id = req.params.id;
+      let user = await User_Addresses.findOne({
+        where: {
+          id: id,
+        },
+      });
+      res.status(200).send(user);
+    } catch (err) {
+      res.status(500).send(err);
+    }
+  },
+  deleteUserAddress: async (req, res) => {
+    try {
+      let id = req.params.id;
+      // let { userId } = req.body;
+      await User_Addresses.destroy({ where: { id: id } });
+      // const getUserAddress = await User_Addresses.findAll({
+      //   where: { userId },
+      // });
+      res.status(200).send("User Address Deleted");
+    } catch (err) {
+      console.log(err);
+      res.status(500).send(err);
+    }
+  },
 };
