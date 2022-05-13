@@ -8,6 +8,7 @@ const Shipment_Masters = require("../models/Shipment_Masters");
 const Users = require("../models/Users");
 const Warehouse_Products = require("../models/Warehouse_Products");
 const Payment_Confirmations = require("../models/Payment_Confirmations");
+const User_Addresses = require("../models/User_Addresses");
 
 module.exports = {
   getUserCart: async (req, res) => {
@@ -132,24 +133,74 @@ module.exports = {
   },
   submitCheckout: async (req, res) => {
     try {
-      let data = {
-        total: req.body.total,
-        status: req.body.status,
-        userAddressId: req.body.userAddressId,
-        warehouseId: req.body.warehouseId,
-        paymentConfirmationId: req.body.paymentConfirmationId,
-        shipmentMasterId: req.body.shipmentMasterId,
-        userId: req.body.userId,
-        paymentOptionId: req.body.paymentOptionId,
-      };
-      const checkout = await Invoice_Headers.create(data);
-      await checkout.createInvoice_Details({
-        price: req.body.price,
-        quantity: req.body.quantity,
-        invoiceHeaderId: req.body.invoiceHeaderId,
-        productId: req.body.productId,
+      const {
+        total,
+        status,
+        userAddressId,
+        shipmentMasterId,
+        userId,
+        paymentOptionId,
+      } = req.body;
+
+      const cartItems = await Carts.findAll({
+        where: { userId },
+        include: { model: Products, include: Warehouse_Products },
       });
-      res.status(200).send(checkout);
+
+      const invoiceHeader = await Invoice_Headers.create({
+        total,
+        status,
+        userAddressId,
+        shipmentMasterId,
+        userId,
+        paymentOptionId,
+      });
+
+      const invoiceDetails = await Invoice_Details.bulkCreate(
+        cartItems.map((val) => ({
+          price: val.product.price,
+          quantity: val.quantity,
+          subtotal: val.quantity * val.product.price,
+          invoiceHeaderId: invoiceHeader.id,
+          productId: val.productId,
+        }))
+      );
+
+      const stockReserved = cartItems.forEach((val) => {
+        Warehouse_Products.update(
+          {
+            stock_reserved:
+              val.product.warehouse_products[0].stock_reserved + val.quantity,
+          },
+          { where: { productId: val.productId } }
+        );
+      });
+
+      await Carts.destroy({ where: { userId } });
+
+      res.status(200).send({
+        message: "Invoice Has Been Generated Successfully",
+        id: invoiceHeader.id,
+        stockReserved,
+      });
+    } catch (err) {
+      console.log(err);
+      res.status(500).send(err);
+    }
+  },
+  getInvoiceHeader: async (req, res) => {
+    try {
+      const id = req.params.id;
+      const invoiceHeader = await Invoice_Headers.findOne({
+        where: { id: id },
+        include: [
+          { model: User_Addresses },
+          { model: Invoice_Details, include: Products },
+          { model: Shipment_Masters },
+          { model: Payment_Options },
+        ],
+      });
+      res.status(200).send(invoiceHeader);
     } catch (err) {
       console.log(err);
       res.status(500).send(err);
@@ -159,8 +210,8 @@ module.exports = {
     // Products.sync({ alter: true });
     try {
       let data = {
-        //use file to upload only a single image, not files.
         payment_proof: req.file.path,
+        invoiceHeaderId: req.body.invoiceHeaderId,
       };
       const paymentproof = await Payment_Confirmations.create(data);
       res.status(200).send(paymentproof);
@@ -169,5 +220,17 @@ module.exports = {
       res.status(500).send(err);
     }
     console.log(req.file);
+  },
+  getPaymentProof: async (req, res) => {
+    try {
+      const invoiceHeaderId = req.params.id;
+      const paymentProof = await Payment_Confirmations.findOne({
+        where: { invoiceHeaderId: invoiceHeaderId },
+      });
+      res.status(200).send(paymentProof);
+    } catch (err) {
+      console.log(err);
+      res.status(500).send(err);
+    }
   },
 };
