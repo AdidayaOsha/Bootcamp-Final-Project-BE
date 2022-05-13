@@ -35,8 +35,8 @@ Invoice_Headers.belongsTo(Shipment_Masters);
 Payment_Options.hasOne(Invoice_Headers);
 Invoice_Headers.belongsTo(Payment_Options);
 
-Payment_Confirmations.hasOne(Invoice_Headers);
-Invoice_Headers.belongsTo(Payment_Confirmations);
+Invoice_Headers.hasOne(Payment_Confirmations);
+Payment_Confirmations.belongsTo(Invoice_Headers);
 
 Invoice_Headers.hasMany(Invoice_Details);
 Invoice_Details.belongsTo(Invoice_Headers);
