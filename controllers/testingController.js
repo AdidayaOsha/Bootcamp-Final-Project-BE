@@ -1,10 +1,8 @@
 const db = require("../db");
 const Invoice_Details = require("../models/Invoice_Details");
 const Invoice_Headers = require("../models/Invoice_Headers");
-const Products = require("../models/Products");
 const Transactions = require("../models/Transactions");
 const User_Addresses = require("../models/User_Addresses");
-const Warehouses = require("../models/Warehouses");
 const Warehouse_Products = require("../models/Warehouse_Products");
 
 module.exports = {
@@ -15,19 +13,32 @@ module.exports = {
                 include: [{
                     model: Invoice_Headers,
                     required: true,
-                    include: [{
+                    include: [
+                        {
                         model: Invoice_Details,
                         required: true
                     },{
-                        model: Warehouses,
-                        required: true
-                    },{
-                        model: User_Addresses,
-                        required: true
-                    }]
+                        model:User_Addresses,
+                        required:true
+                    }
+                ]
                 }]
             });
-            res.status(200).send(allTransactions);
+            // let table = {
+            //     "idTransaction": allTransactions.invoice_header.id ,
+            //     "warehouse": allTransactions.invoice_header.warehouseId
+            // }
+            // console.log(allTransactions[0].dataValues.invoice_header.total)
+            // let transactionDetails = allTransactions[0].dataValues.invoice_header.invoice_details
+
+            // transactionDetails.map((transaction)=>{
+            //     transaction.dataValues.tes=0
+            //     console.log(transaction)
+            // })
+            
+
+
+            res.status(200).send(transactionDetails);
         } catch (err) {
             res.status(500).send(err);
         }
@@ -44,11 +55,7 @@ module.exports = {
                     include: [
                         {
                         model: Invoice_Details,
-                        required: true,
-                        include: [{
-                            model: Products,
-                            required: true
-                        }]
+                        required: true
                     },{
                         model:User_Addresses,
                         required:true
@@ -74,12 +81,16 @@ module.exports = {
 
                 let productId=transaction.productId
                 let itemInInventory
+                // let warehouseQuantity=itemInInventory.dataValues.stock_ready
+                // let itemQuantity=transaction.quantity
 
                 warehouseInventory.map((item)=>{
                     if(item.productId==productId){
                         itemInInventory=item
                     }
                 })
+
+                // console.log(itemInInventory.dataValues.stock_ready,transaction.quantity)
 
                 if(itemInInventory.dataValues.stock_ready < transaction.quantity){
                     console.log("kurang")
@@ -95,7 +106,7 @@ module.exports = {
                 }
 
                 if(insufficientStock){
-                    transactionsId.status="request needed"
+                    transactionsId.status="waiting request"
                 }
 
             })
