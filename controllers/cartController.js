@@ -176,8 +176,6 @@ module.exports = {
         );
       });
 
-      await Carts.destroy({ where: { userId } });
-
       res.status(200).send({
         message: "Invoice Has Been Generated Successfully",
         id: invoiceHeader.id,
@@ -214,6 +212,8 @@ module.exports = {
         invoiceHeaderId: req.body.invoiceHeaderId,
       };
       const paymentproof = await Payment_Confirmations.create(data);
+
+      await Carts.destroy({ where: { userId } });
       res.status(200).send(paymentproof);
     } catch (err) {
       console.log(err);
