@@ -69,6 +69,7 @@ module.exports = {
       let id = req.params.id;
       let warehouses = await Warehouse_Products.findAll({
         where: { warehouseId: id },
+        order: [["createdAt", "DESC"]],
         include: [{ model: Products }],
       });
       res.status(200).send(warehouses);
