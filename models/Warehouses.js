@@ -25,7 +25,7 @@ const Warehouses = sequelize.define(
       allowNull: true,
     },
     phone: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.STRING,
       allowNull: true,
     },
   },

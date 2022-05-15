@@ -14,6 +14,9 @@ const Warehouse_Products = sequelize.define("warehouse_products", {
     allowNull: true,
     defaultValue: 0,
   },
+},
+{
+  paranoid: true,
 });
 
 module.exports = Warehouse_Products;

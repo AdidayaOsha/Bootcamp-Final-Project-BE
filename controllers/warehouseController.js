@@ -3,6 +3,8 @@ const Products = require("../models/Products");
 const Product_Categories = require("../models/Product_Categories");
 const Warehouse_Products = require("../models/Warehouse_Products");
 const Warehouses = require("../models/Warehouses");
+const Shipping_Product = require("../models/Shipping_Product");
+const Operational_Cost = require("../models/Operational_Cost");
 const { Op } = require("sequelize");
 const sequelize = require("../lib/sequelize");
 
@@ -10,7 +12,9 @@ module.exports = {
   getWarehouses: async (req, res) => {
     Warehouses.sync({ alter: true });
     try {
-      let warehouses = await Warehouses.findAll({});
+      let warehouses = await Warehouses.findAll({
+        order: [["id", "DESC"]],
+      });
       res.status(200).send(warehouses);
     } catch (err) {
       res.status(500).send(err);
@@ -37,6 +41,7 @@ module.exports = {
         city: req.body.city,
         province: req.body.province,
         postal_code: req.body.postal_code,
+        phone: req.body.phone,
       };
       const warehouse = await Warehouses.create(data);
       res.status(200).send(warehouse);
@@ -45,6 +50,18 @@ module.exports = {
       res.status(500).send(err);
     }
     console.log(req.file);
+  },
+  updateWarehouse: async (req, res) => {
+    Warehouses.sync({ alter: true });
+    try {
+      let id = req.params.id;
+      const warehouse = await Warehouses.update(req.body, {
+        where: { id: id },
+      });
+      res.status(200).send(warehouse);
+    } catch (err) {
+      res.status(500).send(err);
+    }
   },
   addProduct: async (req, res) => {
     // Warehouses.sync({ alter: true });
@@ -62,6 +79,28 @@ module.exports = {
       res.status(500).send(err);
     }
     console.log(req.file);
+  },
+  updateProduct: async (req, res) => {
+    Warehouse_Products.sync({ alter: true });
+    try {
+      let id = req.params.id;
+      const warehouse = await Warehouse_Products.update(req.body, {
+        where: { id: id },
+      });
+      res.status(200).send(warehouse);
+    } catch (err) {
+      res.status(500).send(err);
+    }
+  },
+  deleteProduct: async (req, res) => {
+    // Products.sync({ alter: true });
+    try {
+      let id = req.params.id;
+      await Warehouse_Products.destroy({ where: { id: id } });
+      res.status(200).send("Warehouse Product Has Been Deleted");
+    } catch (err) {
+      res.status(500).send(err);
+    }
   },
   getWarehouseProductById: async (req, res) => {
     Warehouse_Products.sync({ alter: true });
@@ -86,6 +125,121 @@ module.exports = {
         include: [{ model: Warehouses }],
       });
       res.status(200).send(warehouses);
+    } catch (err) {
+      res.status(500).send(err);
+    }
+  },
+  addShipping: async (req, res) => {
+    // Shipping_Product.sync({ alter: true });
+    try {
+      let data = {
+        status: "requested",
+        total_product: req.body.total_product,
+        productId: req.body.productId,
+        // warehouseProductId: req.body.warehouseProductId,
+        warehouseReqId: req.body.warehouseReqId,
+        warehouseResId: req.body.warehouseResId,
+      };
+      const shipping = await Shipping_Product.create(data);
+      res.status(200).send(shipping);
+    } catch (err) {
+      console.log(err);
+      res.status(500).send(err);
+    }
+    console.log(req.file);
+  },
+  updateShipping: async (req, res) => {
+    // Shipping_Product.sync({ alter: true });
+    try {
+      let id = req.params.id;
+      const shipping = await Shipping_Product.update(req.body, {
+        where: { id: id },
+      });
+      res.status(200).send(shipping);
+    } catch (err) {
+      res.status(500).send(err);
+    }
+  },
+  deleteShipping: async (req, res) => {
+    // Products.sync({ alter: true });
+    try {
+      let id = req.params.id;
+      await Shipping_Product.destroy({ where: { id: id } });
+      res.status(200).send("Shipping Product Has Been Deleted");
+    } catch (err) {
+      res.status(500).send(err);
+    }
+  },
+  getShippingById: async (req, res) => {
+    Shipping_Product.sync({ alter: true });
+    try {
+      let id = req.params.id;
+      let shipping = await Shipping_Product.findAll({
+        where: { warehouseResId: id },
+        order: [["createdAt", "DESC"]],
+        include: [
+          { model: Products },
+          { model: Warehouses, as: "warehouseReq" },
+          { model: Warehouses, as: "warehouseRes" },
+        ],
+      });
+      res.status(200).send(shipping);
+    } catch (err) {
+      res.status(500).send(err);
+    }
+  },
+  addOperationalCost: async (req, res) => {
+    // Warehouses.sync({ alter: true });
+    try {
+      let data = {
+        cost: req.body.cost,
+        total_time: req.body.total_time,
+        warehouseReqId: req.body.warehouseReqId,
+        warehouseResId: req.body.warehouseResId,
+      };
+      const opcost = await Operational_Cost.create(data);
+      res.status(200).send(opcost);
+    } catch (err) {
+      console.log(err);
+      res.status(500).send(err);
+    }
+    console.log(req.file);
+  },
+  updateOperationalCost: async (req, res) => {
+    Warehouse_Products.sync({ alter: true });
+    try {
+      let id = req.params.id;
+      const opcost = await Operational_Cost.update(req.body, {
+        where: { id: id },
+      });
+      res.status(200).send(opcost);
+    } catch (err) {
+      res.status(500).send(err);
+    }
+  },
+  deleteOperationalCost: async (req, res) => {
+    // Products.sync({ alter: true });
+    try {
+      let id = req.params.id;
+      await Operational_Cost.destroy({ where: { id: id } });
+      res.status(200).send("Operational Cost Product Has Been Deleted");
+    } catch (err) {
+      res.status(500).send(err);
+    }
+  },
+  getOperationalCost: async (req, res) => {
+    Warehouse_Products.sync({ alter: true });
+    try {
+      let id = req.params.id;
+      let opcost = await Operational_Cost.findAll({
+        where: { warehouseReqId: id },
+        order: [["createdAt", "DESC"]],
+        include: [
+          { model: Warehouses, as: "warehouseReq" },
+          { model: Warehouses, as: "warehouseRes" },
+        ],
+      });
+      res.status(200).send(opcost);
     } catch (err) {
       res.status(500).send(err);
     }
