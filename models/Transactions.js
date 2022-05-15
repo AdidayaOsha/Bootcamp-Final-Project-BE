@@ -1,6 +1,7 @@
 const sequelize = require("../lib/sequelize");
 const { DataTypes } = require("sequelize");
 const Invoice_Headers = require("./Invoice_Headers");
+const Request_Stock = require("./Request_Stock");
 
 const Transactions = sequelize.define("transactions", {
   number: {

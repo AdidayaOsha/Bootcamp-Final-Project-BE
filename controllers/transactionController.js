@@ -252,4 +252,83 @@ module.exports = {
       res.status(err.code).send("Error Transaction: " + err.message);
     }
   },
+  deliver: async (req, res) => {
+    try {
+      let id = req.params.id;
+      let dataTransaction = await Transactions.findOne({
+        where: { id: id },
+        include: [
+          {
+            model: Invoice_Headers,
+            required: true,
+            include: [
+              {
+                model: Invoice_Details,
+                required: true,
+                include: [
+                  {
+                    model: Products,
+                    required: true,
+                  },
+                  {
+                    model: Warehouses,
+                    required: true,
+                  },
+                ],
+              },
+              {
+                model: User_Addresses,
+                required: true,
+              },
+            ],
+          },
+        ],
+      });
+      let invoiceDetails = dataTransaction.invoice_header.invoice_details;
+      let warehouseId = dataTransaction.invoice_header.warehouseId;
+
+      for (i = 0; i < invoiceDetails.length; i++) {
+        // getdata dari warehouse product dengan productId invoice.productid dan warehouseid = warehouseId
+        let getProduct = await Warehouse_Products.findOne({
+          where: {
+            productId: invoiceDetails[i].productId,
+            warehouseId: warehouseId,
+          },
+        });
+
+        // ambil getdatawarehouse.stock_ready & dan stock_reserved lalu dikurangi dengan quantity
+        let stockReady = getProduct.stock_ready;
+        let newStock = stockReady - invoiceDetails[i].quantity;
+
+        // patch ke datawarehouse dengan id getdatawarehouse.id
+
+        await Warehouse_Products.update(
+          {
+            stock_ready: newStock,
+            stock_reserved: newStock,
+          },
+          {
+            where: {
+              id: getProduct.id,
+            },
+          }
+        );
+        console.log(getProduct.id);
+        // console.log("stock ready" + stockReady);
+        // console.log("quantity" + invoiceDetails[i].quantity);
+        // console.log("stock baru" + newStock);
+      }
+      let updateStatus = await Transactions.update(
+        {
+          status: "delivered",
+        },
+        {
+          where: { id: id },
+        }
+      );
+      res.status(200).send(updateStatus);
+    } catch (err) {
+      res.status(err.code).send("Error Transaction: " + err.message);
+    }
+  },
 };
