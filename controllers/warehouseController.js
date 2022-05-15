@@ -69,9 +69,20 @@ module.exports = {
       let id = req.params.id;
       let warehouses = await Warehouse_Products.findAll({
         where: { warehouseId: id },
-        include: [
-           {model: Products}, 
-        ]
+        include: [{ model: Products }],
+      });
+      res.status(200).send(warehouses);
+    } catch (err) {
+      res.status(500).send(err);
+    }
+  },
+  getAllWarehouseProductById: async (req, res) => {
+    Warehouse_Products.sync({ alter: true });
+    try {
+      let id = req.params.id;
+      let warehouses = await Warehouse_Products.findAll({
+        where: { productId: id },
+        include: [{ model: Warehouses }],
       });
       res.status(200).send(warehouses);
     } catch (err) {
