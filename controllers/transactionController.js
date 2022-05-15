@@ -57,7 +57,6 @@ module.exports = {
                 }]
             });
   
-
             let warehouseId  = transactionsId.dataValues.invoice_header.warehouseId
             console.log(warehouseId);
 
@@ -65,9 +64,7 @@ module.exports = {
                 where:{warehouseId:warehouseId }
             })
 
-
             let insufficientStock= false
-
             
             let transactionDetails = transactionsId.dataValues.invoice_header.invoice_details
             transactionDetails.map((transaction)=>{
@@ -82,13 +79,11 @@ module.exports = {
                 })
 
                 if(itemInInventory.dataValues.stock_ready < transaction.quantity){
-                    console.log("kurang")
                     transaction.dataValues.status="Stock insufficient"
                     transaction.dataValues.requestStock=transaction.quantity-itemInInventory.dataValues.stock_ready
                     transaction.dataValues.warehouseStock=itemInInventory.dataValues.stock_ready
                     insufficientStock=true
                 }else{
-                    console.log("cukup")
                     transaction.dataValues.status="Stock Ready"
                     transaction.dataValues.requestStock=0
                     transaction.dataValues.warehouseStock=itemInInventory.dataValues.stock_ready
