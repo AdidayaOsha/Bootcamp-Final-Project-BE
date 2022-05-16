@@ -13,9 +13,7 @@ module.exports = {
     Warehouses.sync({ alter: true });
     try {
       let warehouses = await Warehouses.findAll({
-        order: [
-          ['id', 'DESC'],
-        ],
+        order: [["id", "DESC"]],
       });
       res.status(200).send(warehouses);
     } catch (err) {
@@ -57,7 +55,9 @@ module.exports = {
     Warehouses.sync({ alter: true });
     try {
       let id = req.params.id;
-      const warehouse = await Warehouses.update(req.body, { where: { id: id } });
+      const warehouse = await Warehouses.update(req.body, {
+        where: { id: id },
+      });
       res.status(200).send(warehouse);
     } catch (err) {
       res.status(500).send(err);
@@ -84,7 +84,9 @@ module.exports = {
     Warehouse_Products.sync({ alter: true });
     try {
       let id = req.params.id;
-      const warehouse = await Warehouse_Products.update(req.body, { where: { id: id } });
+      const warehouse = await Warehouse_Products.update(req.body, {
+        where: { id: id },
+      });
       res.status(200).send(warehouse);
     } catch (err) {
       res.status(500).send(err);
@@ -106,12 +108,21 @@ module.exports = {
       let id = req.params.id;
       let warehouses = await Warehouse_Products.findAll({
         where: { warehouseId: id },
-        order: [
-          ['createdAt', 'DESC'],
-        ],
-        include: [
-           {model: Products}, 
-        ]
+        order: [["createdAt", "DESC"]],
+        include: [{ model: Products }],
+      });
+      res.status(200).send(warehouses);
+    } catch (err) {
+      res.status(500).send(err);
+    }
+  },
+  getAllWarehouseProductById: async (req, res) => {
+    Warehouse_Products.sync({ alter: true });
+    try {
+      let id = req.params.id;
+      let warehouses = await Warehouse_Products.findAll({
+        where: { productId: id },
+        include: [{ model: Warehouses }],
       });
       res.status(200).send(warehouses);
     } catch (err) {
@@ -122,7 +133,7 @@ module.exports = {
     // Shipping_Product.sync({ alter: true });
     try {
       let data = {
-        status: 'requested',
+        status: "requested",
         total_product: req.body.total_product,
         productId: req.body.productId,
         // warehouseProductId: req.body.warehouseProductId,
@@ -141,7 +152,9 @@ module.exports = {
     // Shipping_Product.sync({ alter: true });
     try {
       let id = req.params.id;
-      const shipping = await Shipping_Product.update(req.body, { where: { id: id } });
+      const shipping = await Shipping_Product.update(req.body, {
+        where: { id: id },
+      });
       res.status(200).send(shipping);
     } catch (err) {
       res.status(500).send(err);
@@ -163,16 +176,12 @@ module.exports = {
       let id = req.params.id;
       let shipping = await Shipping_Product.findAll({
         where: { warehouseResId: id },
-        order: [
-          ['createdAt', 'DESC'],
-        ],
+        order: [["createdAt", "DESC"]],
         include: [
-            {model: Products}, 
-            {model: Warehouses,
-            as: 'warehouseReq'},
-            {model: Warehouses,
-              as: 'warehouseRes'},
-        ]
+          { model: Products },
+          { model: Warehouses, as: "warehouseReq" },
+          { model: Warehouses, as: "warehouseRes" },
+        ],
       });
       res.status(200).send(shipping);
     } catch (err) {
@@ -200,7 +209,9 @@ module.exports = {
     Warehouse_Products.sync({ alter: true });
     try {
       let id = req.params.id;
-      const opcost = await Operational_Cost.update(req.body, { where: { id: id } });
+      const opcost = await Operational_Cost.update(req.body, {
+        where: { id: id },
+      });
       res.status(200).send(opcost);
     } catch (err) {
       res.status(500).send(err);
@@ -222,15 +233,11 @@ module.exports = {
       let id = req.params.id;
       let opcost = await Operational_Cost.findAll({
         where: { warehouseReqId: id },
-        order: [
-          ['createdAt', 'DESC'],
-        ],
+        order: [["createdAt", "DESC"]],
         include: [
-          {model: Warehouses,
-            as: 'warehouseReq'},
-          {model: Warehouses,
-            as: 'warehouseRes'},
-        ]
+          { model: Warehouses, as: "warehouseReq" },
+          { model: Warehouses, as: "warehouseRes" },
+        ],
       });
       res.status(200).send(opcost);
     } catch (err) {
