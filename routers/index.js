@@ -8,6 +8,7 @@ const warehouseRouter = require("./warehouseRouter");
 const transactionRouter = require("./transactionRouter");
 const testingRouter = require("./testingRouter");
 const reportRouter = require("./reportRouter");
+const requestRouter = require("./requestRouter");
 
 module.exports = {
   adminRouter,
@@ -20,4 +21,5 @@ module.exports = {
   transactionRouter,
   testingRouter,
   reportRouter,
+  requestRouter,
 };

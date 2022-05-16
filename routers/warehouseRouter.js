@@ -6,6 +6,10 @@ router.get("/:id", warehouseController.getWarehouseById);
 router.post("/add", warehouseController.addWarehouse);
 router.patch("/update/:id", warehouseController.updateWarehouse);
 router.get("/product/:id", warehouseController.getWarehouseProductById);
+router.get(
+  "/:id/getAllWarehouseProduct",
+  warehouseController.getAllWarehouseProductById
+);
 router.post("/addproduct", warehouseController.addProduct);
 router.patch("/updateproduct/:id", warehouseController.updateProduct);
 router.delete("/deleteproduct/:id", warehouseController.deleteProduct);

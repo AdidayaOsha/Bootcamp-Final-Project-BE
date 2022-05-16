@@ -72,10 +72,10 @@ module.exports = {
                     ],
                 ],
                 where: {
-                    createdAt: {
-                        [Op.gt] : date,
-                        [Op.lt] : nextdate,
-                    }
+                    // createdAt: {
+                    //     [Op.gt] : date,
+                    //     [Op.lt] : nextdate,
+                    // }
                 },
             })
 
