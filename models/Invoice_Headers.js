@@ -21,7 +21,7 @@ const Invoice_Headers = sequelize.define("invoice_headers", {
     allowNull: false,
     validate: {
       isIn: {
-        args: [["pending", "approved", "rejected"]],
+        args: [["unpaid", "pending", "approved", "rejected"]],
         msg: "Wrong Value!",
       },
     },
@@ -41,6 +41,9 @@ Invoice_Headers.belongsTo(Warehouses);
 
 Payment_Options.hasOne(Invoice_Headers);
 Invoice_Headers.belongsTo(Payment_Options);
+
+// Payment_Confirmations.hasOne(Invoice_Headers);
+// Invoice_Headers.belongsTo(Payment_Confirmations);
 
 Invoice_Headers.hasOne(Payment_Confirmations);
 Payment_Confirmations.belongsTo(Invoice_Headers);

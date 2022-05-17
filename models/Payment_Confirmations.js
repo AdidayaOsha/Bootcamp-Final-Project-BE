@@ -1,5 +1,6 @@
 const sequelize = require("../lib/sequelize");
 const { DataTypes } = require("sequelize");
+const Invoice_Headers = require("./Invoice_Headers");
 
 const Payment_Confirmations = sequelize.define("payment_confirmations", {
   payment_proof: {
@@ -10,3 +11,6 @@ const Payment_Confirmations = sequelize.define("payment_confirmations", {
 });
 
 module.exports = Payment_Confirmations;
+
+// Invoice_Headers.hasOne(Payment_Confirmations);
+// Payment_Confirmations.belongsTo(Invoice_Headers);
