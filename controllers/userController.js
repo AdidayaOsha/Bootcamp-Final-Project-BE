@@ -11,6 +11,7 @@ const User_Addresses = require("../models/User_Addresses");
 const Cities = require("../models/Cities");
 const Provinces = require("../models/Provinces");
 const Districts = require("../models/Districts");
+const { Op } = require("sequelize");
 
 module.exports = {
   getUsers: async (req, res) => {
