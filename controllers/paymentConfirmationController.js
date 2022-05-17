@@ -5,8 +5,9 @@ const Products = require("../models/Products");
 const Transactions = require("../models/Transactions");
 const Users = require("../models/Users");
 const User_Addresses = require("../models/User_Addresses");
-const Warehouses = require("../models/Warehouses");
 const Payments = require("../models/Payment_Confirmations");
+const Warehouses = require("../models/Warehouses");
+const Warehouse_Products = require("../models/Warehouse_Products");
 
 module.exports = {
   getPayment: async (req, res) => {
@@ -88,7 +89,7 @@ module.exports = {
     Transactions.sync({ alter: true });
     try {
       const { number } = req.body;
-      let id = parseInt(req.params.id);
+      let id = req.params.id;
       let payment = await Payments.findOne({
         where: {
           id: id,
@@ -120,10 +121,19 @@ module.exports = {
           },
         ],
       });
+      console.log(payment.dataValues.id);
       let transaction = await Transactions.create({
-        invoiceHeaderId: id,
-        number,
+        invoiceHeaderId: payment.dataValues.id,
+        number: payment.dataValues.invoice_header.id,
       });
+      await Invoice_Headers.update(
+        {
+          status: "approved",
+        },
+        {
+          where: { id: id },
+        }
+      );
       res.status(200).send(transaction);
     } catch (err) {
       res.status(500).send(err);
@@ -162,9 +172,8 @@ module.exports = {
           },
         ],
       });
-      let invoiceDetails = payment.invoice_header.invoice_details;
-      let warehouseId = payment.invoice_header.warehouseId;
-
+      let invoiceDetails = payment.dataValues.invoice_header.invoice_details;
+      let warehouseId = payment.dataValues.invoice_header.warehouseId;
       for (i = 0; i < invoiceDetails.length; i++) {
         let getProduct = await Warehouse_Products.findOne({
           where: {
@@ -184,7 +193,6 @@ module.exports = {
             },
           }
         );
-        console.log(getProduct.id);
       }
       let updateStatus = await Invoice_Headers.update(
         {
