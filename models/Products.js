@@ -3,6 +3,7 @@ const { DataTypes } = require("sequelize");
 const Product_Categories = require("./Product_Categories");
 const Warehouse_Products = require("./Warehouse_Products");
 const Invoice_Details = require("./Invoice_Details");
+const Request_Stock = require("./Request_Stock");
 
 const Products = sequelize.define(
   "products",
@@ -46,3 +47,12 @@ Warehouse_Products.belongsTo(Products);
 
 Products.hasMany(Invoice_Details);
 Invoice_Details.belongsTo(Products);
+
+Products.hasMany(Request_Stock, {
+  foreignKey: { allowNull: false },
+  onDelete: "CASCADE",
+});
+Request_Stock.belongsTo(Products, {
+  foreignKey: { allowNull: false },
+  onDelete: "CASCADE",
+});

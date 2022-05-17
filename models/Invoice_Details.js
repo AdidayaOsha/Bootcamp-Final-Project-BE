@@ -1,5 +1,6 @@
 const sequelize = require("../lib/sequelize");
 const { DataTypes } = require("sequelize");
+const Warehouses = require("./Warehouses");
 
 const Invoice_Details = sequelize.define("invoice_details", {
   price: {
@@ -13,6 +14,9 @@ const Invoice_Details = sequelize.define("invoice_details", {
   subtotal: {
     type: DataTypes.INTEGER,
     allowNull: false,
+  },
+  warehouseId: {
+    type: DataTypes.INTEGER,
   },
 });
 

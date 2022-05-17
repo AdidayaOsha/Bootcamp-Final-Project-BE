@@ -12,6 +12,9 @@ const {
   warehouseRouter,
   transactionRouter,
   testingRouter,
+  reportRouter,
+  requestRouter,
+  paymentConfirmationRouter,
 } = require("./routers");
 
 const app = express();
@@ -43,7 +46,10 @@ app.use("/catalog", catalogRouter);
 app.use("/images", express.static("./images"));
 app.use("/users", userRouter);
 app.use("/warehouses", warehouseRouter);
+app.use("/paymentsConfirmation", paymentConfirmationRouter);
 app.use("/transactions", transactionRouter);
 app.use("/testing", testingRouter);
+app.use("/reports", reportRouter);
+app.use("/request", requestRouter);
 
 app.listen(PORT, () => console.log("SERVER RUNNING IN PORT:", PORT));
