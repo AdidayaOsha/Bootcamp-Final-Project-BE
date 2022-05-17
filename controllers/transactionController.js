@@ -367,7 +367,6 @@ module.exports = {
       let warehouseId = dataTransaction.invoice_header.warehouseId;
 
       for (i = 0; i < invoiceDetails.length; i++) {
-        // getdata dari warehouse product dengan productId invoice.productid dan warehouseid = warehouseId
         let getProduct = await Warehouse_Products.findOne({
           where: {
             productId: invoiceDetails[i].productId,
@@ -375,11 +374,8 @@ module.exports = {
           },
         });
 
-        // ambil getdatawarehouse.stock_reeadyd & dan stock_reserved lalu dikurangi dengan quantity
         let stockReady = getProduct.stock_ready;
         let newStock = stockReady + invoiceDetails[i].quantity;
-
-        // patch ke datawarehouse dengan id getdatawarehouse.id
 
         await Warehouse_Products.update(
           {
@@ -392,9 +388,6 @@ module.exports = {
           }
         );
         console.log(getProduct.id);
-        // console.log("stock ready" + stockReady);
-        // console.log("quantity" + invoiceDetails[i].quantity);
-        // console.log("stock baru" + newStock);
       }
       let updateStatus = await Transactions.update(
         {
