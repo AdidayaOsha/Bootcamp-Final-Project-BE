@@ -187,7 +187,7 @@ module.exports = {
       });
       res.status(200).send(user);
     } catch (err) {
-      console.log(err)
+      console.log(err);
       res.status(err.code).send("Error Keep Login: " + err.message);
     }
   },
@@ -293,6 +293,8 @@ module.exports = {
         mobile: req.body.mobile,
         userId: req.body.userId,
         isDefault: req.body.isDefault,
+        latitude: req.body.latitude,
+        longitude: req.body.longitude,
       };
       const address = await User_Addresses.create(data);
       res.status(200).send(address);
@@ -484,10 +486,9 @@ module.exports = {
   getDefaultAddress: async (req, res) => {
     User_Addresses.sync({ alter: true });
     try {
+      const { userId } = req.body;
       const defaultAddress = await User_Addresses.findOne({
-        where: {
-          isDefault: true,
-        },
+        where: { isDefault: true, userId },
       });
       res.status(200).send(defaultAddress);
     } catch (err) {
@@ -498,12 +499,22 @@ module.exports = {
   updateDefaultAddress: async (req, res) => {
     User_Addresses.sync({ alter: true });
     try {
-      const defaultAddress = await User_Addresses.update(req.body, {
+      let isDefault = req.body;
+      let id = req.body;
+
+      const defaultAddress = await User_Addresses.update((isDefault = false), {
         where: {
           isDefault: true,
         },
       });
-      res.status(200).send(defaultAddress);
+
+      const setDefault = await User_Addresses.update((isDefault = true), {
+        where: {
+          id,
+        },
+      });
+
+      res.status(200).send({ setDefault, defaultAddress });
     } catch (err) {
       res.status(500).send(err);
       console.log(err);

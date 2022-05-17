@@ -9,41 +9,286 @@ const Users = require("../models/Users");
 const Warehouse_Products = require("../models/Warehouse_Products");
 const Payment_Confirmations = require("../models/Payment_Confirmations");
 const User_Addresses = require("../models/User_Addresses");
+const sequelize = require("../lib/sequelize");
+const { getDistance, convertDistance } = require("geolib");
+const Warehouses = require("../models/Warehouses");
+const Cities = require("../models/Cities");
+const { Op } = require("sequelize");
 
 module.exports = {
   getUserCart: async (req, res) => {
-    // Products.sync({ alter: true });
     try {
-      let id = req.params.id;
-      let carts = await Users.findOne({
-        where: { id: id },
+      const { userId } = req.body;
+      let carts = await Carts.findAll({
+        attributes: [
+          "id",
+          "quantity",
+          "subtotal",
+          [
+            sequelize.literal(
+              `(SELECT sum(stock_ready) from warehouse_products WHERE warehouse_products.productId = carts.productId)`
+            ),
+            "totalQty",
+          ],
+        ],
         include: [
           {
-            model: Carts,
-            include: [{ model: Products, include: Warehouse_Products }],
+            model: Products,
+            attributes: {
+              exclude: ["createdAt", "deletedAt", "updatedAt", "description"],
+            },
           },
         ],
       });
-      res.status(200).send(carts);
+
+      const result = carts;
+
+      const unpaidInvoice = await Invoice_Headers.findOne({
+        include: [
+          { model: User_Addresses },
+          { model: Invoice_Details, include: Products },
+          { model: Shipment_Masters },
+          { model: Payment_Options },
+        ],
+        where: { userId },
+        status: "unpaid",
+      });
+
+      if (unpaidInvoice) {
+        result.unpaidInvoice = unpaidInvoice;
+      }
+
+      res.status(200).send({ carts, unpaidInvoice });
     } catch (err) {
+      console.log(err);
+      res.status(500).send(err);
+    }
+  },
+  sandboxGetUserCart: async (req, res) => {
+    // Products.sync({ alter: true });
+    try {
+      let id = req.params.id;
+      let addressId = req.body.addressId;
+      // let carts = await Carts.findAll({
+      //   attributes: [
+      //     "id",
+      //     "quantity",
+      //     "subtotal",
+      //     [
+      //       sequelize.literal(
+      //         `(SELECT sum(stock_ready) from warehouse_products WHERE warehouse_products.productId = carts.productId)`
+      //       ),
+      //       "totalQty",
+      //     ],
+      //   ],
+      //   include: [
+      //     {
+      //       model: Products,
+      //       attributes: {
+      //         exclude: ["createdAt", "deletedAt", "updatedAt", "description"],
+      //       },
+      //     },
+      //   ],
+      // });
+
+      let userLocation;
+      let cityLocation;
+
+      userLocation = await User_Addresses.findOne({
+        where: { id: addressId },
+        attributes: ["latitude", "longitude", "city"],
+      });
+      if (!userLocation.latitude || !userLocation.longitude) {
+        cityLocation = await Cities.findOne({
+          where: { name: userLocation.city },
+          attributes: ["latitude", "longitude"],
+        });
+      }
+      // console.log(userLocation);
+
+      const warehouseLocation = await Warehouses.findAll({
+        attributes: ["id", "name", "latitude", "longitude"],
+      });
+
+      // the warehouse distance comparison
+      let distances = [];
+
+      warehouseLocation.forEach((location) => {
+        let distance = getDistance(
+          // User
+          {
+            latitude: userLocation.latitude
+              ? userLocation.latitude
+              : cityLocation.latitude,
+            longitude: userLocation.longitude
+              ? userLocation.longitude
+              : cityLocation.longitude,
+          },
+          // Warehouse
+          {
+            latitude: location.latitude,
+            longitude: location.longitude,
+          },
+          1
+        );
+        distances.push({
+          id: location.id,
+          name: location.name,
+          distance: convertDistance(distance, "km"),
+        });
+      });
+      distances = distances.sort((a, b) => {
+        if (a.distance < b.distance) {
+          return -1;
+        }
+      });
+      // console.log(distances);
+      console.log(distances.map((item) => item.id));
+
+      const warehouseDistanceId = distances.map((item) => item.id);
+
+      const userCart = await Users.findByPk(id, {
+        attributes: ["id"],
+        include: {
+          model: Carts,
+          attributes: ["quantity", "productId"],
+
+          include: {
+            model: Products,
+            attributes: ["name"],
+            include: {
+              model: Warehouse_Products,
+              attributes: [
+                "id",
+                "stock_ready",
+                "stock_reserved",
+                "warehouseId",
+              ],
+              include: { model: Warehouses, attributes: ["name"] },
+              // where: { warehouseId: warehouseDistanceId },
+              required: true,
+            },
+          },
+        },
+      });
+
+      await userCart.carts.forEach((item) => {
+        // console.log(
+        //   item.product.warehouse_products.sort((warehouse, index) => {
+        //     if (warehouse.warehouseId === warehouseDistanceId[index]) {
+        //       return -1;
+        //     } else {
+        //       return 1;
+        //     }
+        //   })
+        // );
+        if (item.product.warehouse_products.length === 1) {
+          Warehouse_Products.update(
+            {
+              // stock_ready:
+              //   item.product.warehouse_products[0].stock_ready -
+              //   item.quantity,
+              stock_reserved:
+                item.product.warehouse_products[0].stock_reserved +
+                item.quantity,
+            },
+            {
+              where: {
+                id: item.product.warehouse_products[0].id,
+              },
+            }
+          );
+        } else {
+          // Tes dulu masing2 warehouse passed the test apa ngga
+          let remainingQty = item.quantity;
+          item.product.warehouse_products.every((warehouse) => {
+            // stock not enough,
+            if (warehouse.stock_ready <= remainingQty) {
+              Warehouse_Products.update(
+                {
+                  // stock_ready: 0,
+                  stock_reserved: warehouse.stock_reserved + item.quantity,
+                },
+                {
+                  where: {
+                    id: warehouse.id,
+                  },
+                }
+              );
+              remainingQty -= warehouse.stock_ready;
+              if (remainingQty === 0) {
+                return false;
+              } else {
+                return true;
+              }
+            } else {
+              Warehouse_Products.update(
+                {
+                  stock_reserved: warehouse.stock_reserved + remainingQty,
+                },
+                {
+                  where: {
+                    id: warehouse.id,
+                  },
+                }
+              );
+              return false;
+            }
+          });
+        }
+      });
+
+      const updatedUserCart = await Carts.findAll({
+        where: { userId: id },
+        attributes: ["id", "quantity", "productId"],
+        include: {
+          model: Products,
+          attributes: ["name"],
+          include: {
+            model: Warehouse_Products,
+            attributes: ["stock_ready", "stock_reserved", "warehouseId"],
+            include: { model: Warehouses, attributes: ["name"] },
+            where: { warehouseId: warehouseDistanceId },
+            required: true,
+          },
+        },
+      });
+
+      res.status(200).send({ userCart, updatedUserCart });
+    } catch (err) {
+      console.log(err);
       res.status(500).send(err);
     }
   },
   updateCartQty: async (req, res) => {
     try {
       let id = req.params.id;
-      let { userId } = req.body;
-      const carts = await Carts.update(req.body, { where: { id: id } });
-      const getUserCart = await Carts.findAll({
+      let { userId, quantity } = req.body;
+      await Carts.update({ quantity }, { where: { id: id } });
+      let carts = await Carts.findAll({
         where: { userId },
+        attributes: [
+          "id",
+          "quantity",
+          "subtotal",
+          [
+            sequelize.literal(
+              `(SELECT sum(stock_ready) from warehouse_products WHERE warehouse_products.productId = carts.productId)`
+            ),
+            "totalQty",
+          ],
+        ],
+
         include: [
           {
             model: Products,
-            include: [{ model: Warehouse_Products }],
+            attributes: {
+              exclude: ["createdAt", "deletedAt", "updatedAt", "description"],
+            },
           },
         ],
       });
-      res.status(200).send({ carts, getUserCart });
+      res.status(200).send(carts);
     } catch (err) {
       res.status(500).send(err);
     }
@@ -70,16 +315,30 @@ module.exports = {
       let id = req.params.id;
       let { userId } = req.body;
       await Carts.destroy({ where: { id: id } });
-      const getUserCart = await Carts.findAll({
+      let carts = await Carts.findAll({
         where: { userId },
+        attributes: [
+          "id",
+          "quantity",
+          "subtotal",
+          [
+            sequelize.literal(
+              `(SELECT sum(stock_ready) from warehouse_products WHERE warehouse_products.productId = carts.productId)`
+            ),
+            "totalQty",
+          ],
+        ],
+
         include: [
           {
             model: Products,
-            include: [{ model: Warehouse_Products }],
+            attributes: {
+              exclude: ["createdAt", "deletedAt", "updatedAt", "description"],
+            },
           },
         ],
       });
-      res.status(200).send(getUserCart);
+      res.status(200).send(carts);
     } catch (err) {
       console.log(err);
       res.status(500).send(err);
@@ -166,13 +425,55 @@ module.exports = {
         }))
       );
 
-      const stockReserved = cartItems.forEach((val) => {
+      // itung dulu jarak antar warehouse yang paling terdekat.
+
+      const houseLocation = await User_Addresses.findOne({
+        where: { id: 98 },
+        attributes: ["latitude", "longitude"],
+      });
+      console.log(houseLocation);
+
+      const warehouseLocation = await Warehouses.findAll({
+        attributes: ["id", "name", "latitude", "longitude"],
+      });
+
+      let distances = [];
+
+      warehouseLocation.forEach((location) => {
+        let distance = getDistance(
+          {
+            latitude: houseLocation.latitude,
+            longitude: houseLocation.longitude,
+          },
+          {
+            latitude: location.latitude,
+            longitude: location.longitude,
+          },
+          1
+        );
+        distances.push({
+          id: location.id,
+          name: location.name,
+          distance: convertDistance(distance, "km"),
+        });
+      });
+      distances = distances.sort((a, b) => {
+        if (a.distance < b.distance) {
+          return -1;
+        }
+      });
+      console.log(distances);
+      console.log(distances.map((item) => item.id));
+
+      const stockReserved = cartItems.forEach((item, idx) => {
         Warehouse_Products.update(
           {
             stock_reserved:
-              val.product.warehouse_products[0].stock_reserved + val.quantity,
+              item.product.warehouse_products[0].stock_reserved + item.quantity,
+            // stock_ready:
+            //   item.product.warehouse_products[0].stock_ready - item.quantity,
           },
-          { where: { productId: val.productId } }
+          { where: { productId: item.productId } }
         );
       });
 
@@ -207,11 +508,21 @@ module.exports = {
   addPaymentProof: async (req, res) => {
     // Products.sync({ alter: true });
     try {
-      let data = {
-        payment_proof: req.file.path,
-        invoiceHeaderId: req.body.invoiceHeaderId,
-      };
+      const { userId } = req.body;
+      const data = req.body;
+      if (req.file?.path) {
+        data.payment_proof = req.file.path;
+      }
       const paymentproof = await Payment_Confirmations.create(data);
+
+      if (req.file.path) {
+        await Invoice_Headers.update(
+          { status: "pending" },
+          {
+            where: { status: "unpaid", userId: userId },
+          }
+        );
+      }
 
       await Carts.destroy({ where: { userId } });
       res.status(200).send(paymentproof);
@@ -228,6 +539,19 @@ module.exports = {
         where: { invoiceHeaderId: invoiceHeaderId },
       });
       res.status(200).send(paymentProof);
+    } catch (err) {
+      console.log(err);
+      res.status(500).send(err);
+    }
+  },
+  cancelTransactions: async (req, res) => {
+    try {
+      const { userId, invoiceHeaderId } = req.body;
+
+      await Invoice_Headers.destroy({
+        where: { userId, invoiceHeaderId },
+      });
+      res.status(200).send(`invoice ID ${invoiceHeaderId} has been deleted`);
     } catch (err) {
       console.log(err);
       res.status(500).send(err);

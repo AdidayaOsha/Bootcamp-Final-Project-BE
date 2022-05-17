@@ -6,6 +6,7 @@ const Shipment_Masters = require("./Shipment_Masters");
 const Invoice_Details = require("./Invoice_Details");
 const Users = require("./Users");
 const Payment_Options = require("./Payment_Options");
+const Warehouses = require("./Warehouses");
 
 const Invoice_Headers = sequelize.define("invoice_headers", {
   total: {
@@ -17,7 +18,7 @@ const Invoice_Headers = sequelize.define("invoice_headers", {
     allowNull: false,
     validate: {
       isIn: {
-        args: [["pending", "approved", "rejected"]],
+        args: [["unpaid", "pending", "approved", "rejected"]],
         msg: "Wrong Value!",
       },
     },
@@ -43,3 +44,6 @@ Invoice_Details.belongsTo(Invoice_Headers);
 
 Users.hasMany(Invoice_Headers);
 Invoice_Headers.belongsTo(Users);
+
+Warehouses.hasOne(Invoice_Headers);
+Invoice_Headers.belongsTo(Warehouses);
