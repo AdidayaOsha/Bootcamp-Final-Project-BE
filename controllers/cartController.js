@@ -69,27 +69,6 @@ module.exports = {
     try {
       let id = req.params.id;
       let addressId = req.body.addressId;
-      // let carts = await Carts.findAll({
-      //   attributes: [
-      //     "id",
-      //     "quantity",
-      //     "subtotal",
-      //     [
-      //       sequelize.literal(
-      //         `(SELECT sum(stock_ready) from warehouse_products WHERE warehouse_products.productId = carts.productId)`
-      //       ),
-      //       "totalQty",
-      //     ],
-      //   ],
-      //   include: [
-      //     {
-      //       model: Products,
-      //       attributes: {
-      //         exclude: ["createdAt", "deletedAt", "updatedAt", "description"],
-      //       },
-      //     },
-      //   ],
-      // });
 
       let userLocation;
       let cityLocation;
@@ -163,79 +142,40 @@ module.exports = {
                 "stock_ready",
                 "stock_reserved",
                 "warehouseId",
+                "productId",
               ],
               include: { model: Warehouses, attributes: ["name"] },
-              // where: { warehouseId: warehouseDistanceId },
+              where: { warehouseId: warehouseDistanceId },
               required: true,
             },
           },
         },
       });
+      console.log(userCart);
 
       await userCart.carts.forEach((item) => {
-        // console.log(
-        //   item.product.warehouse_products.sort((warehouse, index) => {
-        //     if (warehouse.warehouseId === warehouseDistanceId[index]) {
-        //       return -1;
-        //     } else {
-        //       return 1;
-        //     }
-        //   })
-        // );
-        if (item.product.warehouse_products.length === 1) {
-          Warehouse_Products.update(
-            {
-              // stock_ready:
-              //   item.product.warehouse_products[0].stock_ready -
-              //   item.quantity,
-              stock_reserved:
-                item.product.warehouse_products[0].stock_reserved +
-                item.quantity,
-            },
-            {
-              where: {
-                id: item.product.warehouse_products[0].id,
-              },
-            }
-          );
-        } else {
-          // Tes dulu masing2 warehouse passed the test apa ngga
-          let remainingQty = item.quantity;
-          item.product.warehouse_products.every((warehouse) => {
-            // stock not enough,
-            if (warehouse.stock_ready <= remainingQty) {
-              Warehouse_Products.update(
-                {
-                  // stock_ready: 0,
-                  stock_reserved: warehouse.stock_reserved + item.quantity,
-                },
-                {
-                  where: {
-                    id: warehouse.id,
-                  },
-                }
-              );
-              remainingQty -= warehouse.stock_ready;
-              if (remainingQty === 0) {
-                return false;
-              } else {
-                return true;
-              }
-            } else {
-              Warehouse_Products.update(
-                {
-                  stock_reserved: warehouse.stock_reserved + remainingQty,
-                },
-                {
-                  where: {
-                    id: warehouse.id,
-                  },
-                }
-              );
-              return false;
+        const result = [];
+
+        distances.forEach((distance) => {
+          item.product.warehouse_products.forEach((warehouse) => {
+            if (warehouse.warehouseId === distance.id) {
+              result.push(distance.id);
             }
           });
-        }
+        });
+        console.log(result);
+
+        Warehouse_Products.increment(
+          {
+            stock_reserved: item.quantity,
+          },
+          {
+            where: {
+              warehouseId: result[0],
+              productId: item.productId,
+            },
+          }
+        );
       });
 
       const updatedUserCart = await Carts.findAll({
@@ -254,7 +194,7 @@ module.exports = {
         },
       });
 
-      res.status(200).send({ userCart, updatedUserCart });
+      res.status(200).send(userCart);
     } catch (err) {
       console.log(err);
       res.status(500).send(err);
