@@ -5,6 +5,7 @@ const cartRouter = require("./cartRouter");
 const userRouter = require("./userRouter");
 const catalogRouter = require("./catalogRouter");
 const warehouseRouter = require("./warehouseRouter");
+const paymentConfirmationRouter = require("./paymentConfirmationRouter");
 const transactionRouter = require("./transactionRouter");
 const testingRouter = require("./testingRouter");
 const reportRouter = require("./reportRouter");
@@ -18,6 +19,7 @@ module.exports = {
   userRouter,
   catalogRouter,
   warehouseRouter,
+  paymentConfirmationRouter,
   transactionRouter,
   testingRouter,
   reportRouter,

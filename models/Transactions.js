@@ -2,6 +2,7 @@ const sequelize = require("../lib/sequelize");
 const { DataTypes } = require("sequelize");
 const Invoice_Headers = require("./Invoice_Headers");
 const Request_Stock = require("./Request_Stock");
+const Payment_Confirmations = require("./Payment_Confirmations");
 
 const Transactions = sequelize.define("transactions", {
   number: {
@@ -18,12 +19,12 @@ const Transactions = sequelize.define("transactions", {
           [
             "pending",
             "request needed",
-            "ready to process",
+            "Ready to process",
             "waiting request",
             "approved request",
             "rejected request",
-            "delivered",
-            "canceled",
+            "Delivered",
+            "Rejected",
           ],
         ],
         msg: "Wrong Value!",
@@ -36,3 +37,6 @@ module.exports = Transactions;
 
 Invoice_Headers.hasOne(Transactions);
 Transactions.belongsTo(Invoice_Headers);
+
+// Payment_Confirmations.hasOne(Transactions);
+// Transactions.belongsTo(Payment_Confirmations);

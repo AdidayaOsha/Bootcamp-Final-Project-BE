@@ -68,12 +68,12 @@ module.exports = {
       let getWarehouseRequestedId = await Warehouse_Products.findOne({
         where: { warehouseId: warehouseRequestedId, productId: productId },
       });
-      let stockAmount = getWarehouseRequestedId.stock_ready;
+      let stockAmount = getWarehouseRequestedId.stock_reserved;
       let newStockAmount = stockAmount - quantity;
 
       await Warehouse_Products.update(
         {
-          stock_ready: newStockAmount,
+          stock_reserved: newStockAmount,
         },
         {
           where: { id: getWarehouseRequestedId.id, productId: productId },
@@ -84,12 +84,12 @@ module.exports = {
       let getWarehouseRequestingId = await Warehouse_Products.findOne({
         where: { warehouseId: warehouseRequestingId, productId: productId },
       });
-      let requestingStockAmount = getWarehouseRequestingId.stock_ready;
+      let requestingStockAmount = getWarehouseRequestingId.stock_reserved;
       let newRequestingStockAmount = requestingStockAmount + quantity;
 
       await Warehouse_Products.update(
         {
-          stock_ready: newRequestingStockAmount,
+          stock_reserved: newRequestingStockAmount,
         },
         {
           where: { id: getWarehouseRequestingId.id, productId: productId },

@@ -98,18 +98,18 @@ module.exports = {
           }
         });
 
-        if (itemInInventory.dataValues.stock_ready < transaction.quantity) {
-          transaction.dataValues.status = "Stock insufficient";
+        if (itemInInventory.dataValues.stock_reserved < transaction.quantity) {
+          transaction.dataValues.status = "Stock Insufficient";
           transaction.dataValues.requestStock =
-            transaction.quantity - itemInInventory.dataValues.stock_ready;
+            transaction.quantity - itemInInventory.dataValues.stock_reserved;
           transaction.dataValues.warehouseStock =
-            itemInInventory.dataValues.stock_ready;
+            itemInInventory.dataValues.stock_reserved;
           insufficientStock = true;
         } else {
           transaction.dataValues.status = "Stock Ready";
           transaction.dataValues.requestStock = 0;
           transaction.dataValues.warehouseStock =
-            itemInInventory.dataValues.stock_ready;
+            itemInInventory.dataValues.stock_reserved;
         }
 
         if (insufficientStock) {
@@ -181,9 +181,9 @@ module.exports = {
           }
         });
         console.log(item.quantity);
-        console.log(currentInventoryItem.stock_ready);
+        console.log(currentInventoryItem.stock_reserved);
 
-        if (currentInventoryItem.stock_ready < item.quantity) {
+        if (currentInventoryItem.stock_reserved < item.quantity) {
           console.log("Item Kurang");
           insufficientStock = true;
         } else {
@@ -210,7 +210,7 @@ module.exports = {
       } else {
         const updateStatus = await Transactions.update(
           {
-            status: "ready to process",
+            status: "Ready to process",
           },
           {
             where: { id: req.params.id },
@@ -296,9 +296,9 @@ module.exports = {
           },
         });
 
-        // ambil getdatawarehouse.stock_ready & dan stock_reserved lalu dikurangi dengan quantity
-        let stockReady = getProduct.stock_ready;
-        let newStock = stockReady - invoiceDetails[i].quantity;
+        // ambil getdatawarehouse.stock_reeadyd & dan stock_reserved lalu dikurangi dengan quantity
+        let stockReserved = getProduct.stock_reserved;
+        let newStock = stockReserved - invoiceDetails[i].quantity;
 
         // patch ke datawarehouse dengan id getdatawarehouse.id
 
@@ -320,7 +320,85 @@ module.exports = {
       }
       let updateStatus = await Transactions.update(
         {
-          status: "delivered",
+          status: "Delivered",
+        },
+        {
+          where: { id: id },
+        }
+      );
+      res.status(200).send(updateStatus);
+    } catch (err) {
+      res.status(err.code).send("Error Transaction: " + err.message);
+    }
+  },
+  rejectTransaction: async (req, res) => {
+    try {
+      let id = req.params.id;
+      let dataTransaction = await Transactions.findOne({
+        where: { id: id },
+        include: [
+          {
+            model: Invoice_Headers,
+            required: true,
+            include: [
+              {
+                model: Invoice_Details,
+                required: true,
+                include: [
+                  {
+                    model: Products,
+                    required: true,
+                  },
+                  {
+                    model: Warehouses,
+                    required: true,
+                  },
+                ],
+              },
+              {
+                model: User_Addresses,
+                required: true,
+              },
+            ],
+          },
+        ],
+      });
+      let invoiceDetails = dataTransaction.invoice_header.invoice_details;
+      let warehouseId = dataTransaction.invoice_header.warehouseId;
+
+      for (i = 0; i < invoiceDetails.length; i++) {
+        // getdata dari warehouse product dengan productId invoice.productid dan warehouseid = warehouseId
+        let getProduct = await Warehouse_Products.findOne({
+          where: {
+            productId: invoiceDetails[i].productId,
+            warehouseId: warehouseId,
+          },
+        });
+
+        // ambil getdatawarehouse.stock_reeadyd & dan stock_reserved lalu dikurangi dengan quantity
+        let stockReady = getProduct.stock_ready;
+        let newStock = stockReady + invoiceDetails[i].quantity;
+
+        // patch ke datawarehouse dengan id getdatawarehouse.id
+
+        await Warehouse_Products.update(
+          {
+            stock_ready: newStock,
+          },
+          {
+            where: {
+              id: getProduct.id,
+            },
+          }
+        );
+        console.log(getProduct.id);
+        // console.log("stock ready" + stockReady);
+        // console.log("quantity" + invoiceDetails[i].quantity);
+        // console.log("stock baru" + newStock);
+      }
+      let updateStatus = await Transactions.update(
+        {
+          status: "Rejected",
         },
         {
           where: { id: id },
