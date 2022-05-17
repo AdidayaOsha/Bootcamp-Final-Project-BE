@@ -14,6 +14,7 @@ const { getDistance, convertDistance } = require("geolib");
 const Warehouses = require("../models/Warehouses");
 const Cities = require("../models/Cities");
 const { Op } = require("sequelize");
+const Request_Log = require("../models/RequestLog");
 
 module.exports = {
   getUserCart: async (req, res) => {
@@ -83,7 +84,6 @@ module.exports = {
           attributes: ["latitude", "longitude"],
         });
       }
-      // console.log(userLocation);
 
       const warehouseLocation = await Warehouses.findAll({
         attributes: ["id", "name", "latitude", "longitude"],
@@ -153,7 +153,7 @@ module.exports = {
       });
       console.log(userCart);
 
-      await userCart.carts.forEach((item) => {
+      await userCart.carts.forEach(async (item) => {
         const result = [];
 
         distances.forEach((distance) => {
@@ -176,22 +176,21 @@ module.exports = {
             },
           }
         );
-      });
 
-      const updatedUserCart = await Carts.findAll({
-        where: { userId: id },
-        attributes: ["id", "quantity", "productId"],
-        include: {
-          model: Products,
-          attributes: ["name"],
-          include: {
-            model: Warehouse_Products,
-            attributes: ["stock_ready", "stock_reserved", "warehouseId"],
-            include: { model: Warehouses, attributes: ["name"] },
-            where: { warehouseId: warehouseDistanceId },
-            required: true,
-          },
-        },
+        const dataWarehouse = item.product.warehouse_products.find(
+          (warehouse) => {
+            return warehouse.warehouseId === result[0];
+          }
+        );
+        console.log(dataWarehouse);
+
+        if (dataWarehouse.stock_ready < item.quantity) {
+          await Request_Log.create({
+            product: item.productId,
+            quantity: item.quantity - dataWarehouse.stock_ready,
+            reqWarehouse: result[0],
+          });
+        }
       });
 
       res.status(200).send(userCart);
@@ -367,24 +366,41 @@ module.exports = {
 
       // itung dulu jarak antar warehouse yang paling terdekat.
 
-      const houseLocation = await User_Addresses.findOne({
-        where: { id: 98 },
-        attributes: ["latitude", "longitude"],
+      let id = req.params.id;
+
+      let userLocation;
+      let cityLocation;
+
+      userLocation = await User_Addresses.findOne({
+        where: { id: userAddressId },
+        attributes: ["latitude", "longitude", "city"],
       });
-      console.log(houseLocation);
+      if (!userLocation.latitude || !userLocation.longitude) {
+        cityLocation = await Cities.findOne({
+          where: { name: userLocation.city },
+          attributes: ["latitude", "longitude"],
+        });
+      }
 
       const warehouseLocation = await Warehouses.findAll({
         attributes: ["id", "name", "latitude", "longitude"],
       });
 
+      // the warehouse distance comparison
       let distances = [];
 
       warehouseLocation.forEach((location) => {
         let distance = getDistance(
+          // User
           {
-            latitude: houseLocation.latitude,
-            longitude: houseLocation.longitude,
+            latitude: userLocation.latitude
+              ? userLocation.latitude
+              : cityLocation.latitude,
+            longitude: userLocation.longitude
+              ? userLocation.longitude
+              : cityLocation.longitude,
           },
+          // Warehouse
           {
             latitude: location.latitude,
             longitude: location.longitude,
@@ -402,19 +418,76 @@ module.exports = {
           return -1;
         }
       });
-      console.log(distances);
+      // console.log(distances);
       console.log(distances.map((item) => item.id));
 
-      const stockReserved = cartItems.forEach((item, idx) => {
-        Warehouse_Products.update(
-          {
-            stock_reserved:
-              item.product.warehouse_products[0].stock_reserved + item.quantity,
-            // stock_ready:
-            //   item.product.warehouse_products[0].stock_ready - item.quantity,
+      const warehouseDistanceId = distances.map((item) => item.id);
+
+      const userCart = await Users.findByPk(userId, {
+        attributes: ["id"],
+        include: {
+          model: Carts,
+          attributes: ["quantity", "productId"],
+
+          include: {
+            model: Products,
+            attributes: ["name"],
+            include: {
+              model: Warehouse_Products,
+              attributes: [
+                "id",
+                "stock_ready",
+                "stock_reserved",
+                "warehouseId",
+                "productId",
+              ],
+              include: { model: Warehouses, attributes: ["name"] },
+              where: { warehouseId: warehouseDistanceId },
+              required: true,
+            },
           },
-          { where: { productId: item.productId } }
+        },
+      });
+      console.log(userCart);
+
+      await userCart.carts.forEach(async (item) => {
+        const result = [];
+
+        distances.forEach((distance) => {
+          item.product.warehouse_products.forEach((warehouse) => {
+            if (warehouse.warehouseId === distance.id) {
+              result.push(distance.id);
+            }
+          });
+        });
+        console.log(result);
+
+        Warehouse_Products.increment(
+          {
+            stock_reserved: item.quantity,
+          },
+          {
+            where: {
+              warehouseId: result[0],
+              productId: item.productId,
+            },
+          }
         );
+
+        const dataWarehouse = item.product.warehouse_products.find(
+          (warehouse) => {
+            return warehouse.warehouseId === result[0];
+          }
+        );
+        console.log(dataWarehouse);
+
+        if (dataWarehouse.stock_ready < item.quantity) {
+          await Request_Log.create({
+            product: item.productId,
+            quantity: item.quantity - dataWarehouse.stock_ready,
+            reqWarehouse: result[0],
+          });
+        }
       });
 
       res.status(200).send({
