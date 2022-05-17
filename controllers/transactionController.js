@@ -37,6 +37,77 @@ module.exports = {
             ],
           },
         ],
+        order: [["id", "ASC"]],
+      });
+      res.status(200).send(allTransactions);
+    } catch (err) {
+      res.status(500).send(err);
+    }
+  },
+  getTransactionSortAsc: async (req, res) => {
+    Transactions.sync({ alter: true });
+    try {
+      let allTransactions = await Transactions.findAll({
+        include: [
+          {
+            model: Invoice_Headers,
+            required: true,
+            include: [
+              {
+                model: Invoice_Details,
+                required: true,
+              },
+              {
+                model: Warehouses,
+                required: true,
+              },
+              {
+                model: User_Addresses,
+                required: true,
+              },
+              {
+                model: Users,
+                required: true,
+              },
+            ],
+          },
+        ],
+        order: [["updatedAt", "ASC"]],
+      });
+      res.status(200).send(allTransactions);
+    } catch (err) {
+      res.status(500).send(err);
+    }
+  },
+  getTransactionSortDesc: async (req, res) => {
+    Transactions.sync({ alter: true });
+    try {
+      let allTransactions = await Transactions.findAll({
+        include: [
+          {
+            model: Invoice_Headers,
+            required: true,
+            include: [
+              {
+                model: Invoice_Details,
+                required: true,
+              },
+              {
+                model: Warehouses,
+                required: true,
+              },
+              {
+                model: User_Addresses,
+                required: true,
+              },
+              {
+                model: Users,
+                required: true,
+              },
+            ],
+          },
+        ],
+        order: [["updatedAt", "DESC"]],
       });
       res.status(200).send(allTransactions);
     } catch (err) {

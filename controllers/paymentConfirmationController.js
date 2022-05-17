@@ -38,6 +38,77 @@ module.exports = {
             ],
           },
         ],
+        order: [["id", "ASC"]],
+      });
+      res.status(200).send(payment);
+    } catch (err) {
+      res.status(500).send(err);
+    }
+  },
+  getPaymentSortAsc: async (req, res) => {
+    Payments.sync({ alter: true });
+    try {
+      let payment = await Payments.findAll({
+        include: [
+          {
+            model: Invoice_Headers,
+            required: true,
+            include: [
+              {
+                model: Invoice_Details,
+                required: true,
+              },
+              {
+                model: Warehouses,
+                required: true,
+              },
+              {
+                model: User_Addresses,
+                required: true,
+              },
+              {
+                model: Users,
+                required: true,
+              },
+            ],
+          },
+        ],
+        order: [["updatedAt", "ASC"]],
+      });
+      res.status(200).send(payment);
+    } catch (err) {
+      res.status(500).send(err);
+    }
+  },
+  getPaymentSortDesc: async (req, res) => {
+    Payments.sync({ alter: true });
+    try {
+      let payment = await Payments.findAll({
+        include: [
+          {
+            model: Invoice_Headers,
+            required: true,
+            include: [
+              {
+                model: Invoice_Details,
+                required: true,
+              },
+              {
+                model: Warehouses,
+                required: true,
+              },
+              {
+                model: User_Addresses,
+                required: true,
+              },
+              {
+                model: Users,
+                required: true,
+              },
+            ],
+          },
+        ],
+        order: [["updatedAt", "DESC"]],
       });
       res.status(200).send(payment);
     } catch (err) {
