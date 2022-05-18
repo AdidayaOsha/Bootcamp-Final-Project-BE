@@ -9,9 +9,7 @@ module.exports = {
     Products.sync({ alter: true });
     try {
       let products = await Products.findAll({
-        order: [
-          ['createdAt', 'DESC'],
-        ],
+        order: [["createdAt", "DESC"]],
         include: {
           model: Warehouse_Products,
           Warehouses,
@@ -28,13 +26,15 @@ module.exports = {
     Products.sync({ alter: true });
     try {
       let id = req.params.id;
-      let product = await Products.findOne({ where: { id: id },
+      let product = await Products.findOne({
+        where: { id: id },
         include: {
           model: Warehouse_Products,
-        }, });
+        },
+      });
       res.status(200).send(product);
     } catch (err) {
-      console.log(err)
+      console.log(err);
       res.status(500).send(err);
     }
   },
@@ -71,14 +71,15 @@ module.exports = {
     Products.sync({ alter: true });
     try {
       let id = req.params.id;
-      let product = await Products.findAll({ where: { productCategoryId : id },
+      let product = await Products.findAll({
+        where: { productCategoryId: id },
         include: {
           model: Warehouse_Products,
           Warehouses,
           Product_Categories,
           // showing only the name that you want to view
         },
-       });
+      });
       res.status(200).send(product);
     } catch (err) {
       res.status(500).send(err);
@@ -88,9 +89,7 @@ module.exports = {
     Products.sync({ alter: true });
     try {
       let products = await Products.findAll({
-        order: [
-          ['name', 'ASC'],
-        ],
+        order: [["name", "ASC"]],
         include: {
           model: Warehouse_Products,
         },
@@ -104,9 +103,7 @@ module.exports = {
     Products.sync({ alter: true });
     try {
       let products = await Products.findAll({
-        order: [
-          ['name', 'DESC'],
-        ],
+        order: [["name", "DESC"]],
         include: {
           model: Warehouse_Products,
         },
@@ -120,9 +117,7 @@ module.exports = {
     Products.sync({ alter: true });
     try {
       let products = await Products.findAll({
-        order: [
-          ['price', 'DESC'],
-        ],
+        order: [["price", "DESC"]],
         include: {
           model: Warehouse_Products,
         },
@@ -136,9 +131,7 @@ module.exports = {
     Products.sync({ alter: true });
     try {
       let products = await Products.findAll({
-        order: [
-          ['price', 'ASC'],
-        ],
+        order: [["price", "ASC"]],
         include: {
           model: Warehouse_Products,
         },

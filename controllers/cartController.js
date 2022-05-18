@@ -479,7 +479,6 @@ module.exports = {
             return warehouse.warehouseId === result[0];
           }
         );
-        console.log(dataWarehouse);
 
         if (dataWarehouse.stock_ready < item.quantity) {
           await Request_Log.create({
@@ -493,7 +492,6 @@ module.exports = {
       res.status(200).send({
         message: "Invoice Has Been Generated Successfully",
         id: invoiceHeader.id,
-        stockReserved,
       });
     } catch (err) {
       console.log(err);
@@ -526,6 +524,11 @@ module.exports = {
       if (req.file?.path) {
         data.payment_proof = req.file.path;
       }
+
+      // const oldImage = await Payment_Confirmations.findOne({
+      //   where: { userId },
+      // });
+
       const paymentproof = await Payment_Confirmations.create(data);
 
       if (req.file.path) {
