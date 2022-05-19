@@ -345,25 +345,6 @@ module.exports = {
         include: { model: Products, include: Warehouse_Products },
       });
 
-      const invoiceHeader = await Invoice_Headers.create({
-        total,
-        status,
-        userAddressId,
-        shipmentMasterId,
-        userId,
-        paymentOptionId,
-      });
-
-      const invoiceDetails = await Invoice_Details.bulkCreate(
-        cartItems.map((val) => ({
-          price: val.product.price,
-          quantity: val.quantity,
-          subtotal: val.quantity * val.product.price,
-          invoiceHeaderId: invoiceHeader.id,
-          productId: val.productId,
-        }))
-      );
-
       // itung dulu jarak antar warehouse yang paling terdekat.
 
       let id = req.params.id;
@@ -413,6 +394,8 @@ module.exports = {
           distance: convertDistance(distance, "km"),
         });
       });
+
+      // Sort manual dulu gan warehousenya for the nearest ambil attribute distance-nya.
       distances = distances.sort((a, b) => {
         if (a.distance < b.distance) {
           return -1;
@@ -421,14 +404,34 @@ module.exports = {
       // console.log(distances);
       console.log(distances.map((item) => item.id));
 
+      // let's took the sorted WarehouseID into maps.
       const warehouseDistanceId = distances.map((item) => item.id);
+
+      const invoiceHeader = await Invoice_Headers.create({
+        total,
+        status,
+        userAddressId,
+        shipmentMasterId,
+        userId,
+        paymentOptionId,
+        warehouseId: warehouseDistanceId[0],
+      });
+
+      const invoiceDetails = await Invoice_Details.bulkCreate(
+        cartItems.map((val) => ({
+          price: val.product.price,
+          quantity: val.quantity,
+          subtotal: val.quantity * val.product.price,
+          invoiceHeaderId: invoiceHeader.id,
+          productId: val.productId,
+        }))
+      );
 
       const userCart = await Users.findByPk(userId, {
         attributes: ["id"],
         include: {
           model: Carts,
           attributes: ["quantity", "productId"],
-
           include: {
             model: Products,
             attributes: ["name"],
@@ -471,6 +474,13 @@ module.exports = {
               warehouseId: result[0],
               productId: item.productId,
             },
+          }
+        );
+
+        Invoice_Details.update(
+          { warehouseId: result[0] },
+          {
+            where: { productId: item.productId },
           }
         );
 
