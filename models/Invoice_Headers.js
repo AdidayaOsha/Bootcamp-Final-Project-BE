@@ -53,3 +53,6 @@ Invoice_Details.belongsTo(Invoice_Headers);
 
 Users.hasMany(Invoice_Headers);
 Invoice_Headers.belongsTo(Users);
+
+Warehouses.hasOne(Invoice_Headers);
+Invoice_Headers.belongsTo(Warehouses);

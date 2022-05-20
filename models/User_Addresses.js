@@ -40,6 +40,14 @@ const User_Addresses = sequelize.define(
       type: DataTypes.BOOLEAN,
       allowNull: true,
     },
+    latitude: {
+      type: DataTypes.DOUBLE,
+      allowNull: true,
+    },
+    longitude: {
+      type: DataTypes.DOUBLE,
+      allowNull: true,
+    },
   },
   {
     paranoid: true,

@@ -192,21 +192,22 @@ module.exports = {
           },
         ],
       });
-      console.log(payment.dataValues.id);
-      let transaction = await Transactions.create({
-        invoiceHeaderId: payment.dataValues.id,
-        number: payment.dataValues.invoice_header.id,
-      });
-      await Invoice_Headers.update(
-        {
-          status: "approved",
-        },
-        {
-          where: { id: id },
-        }
-      );
-      res.status(200).send(transaction);
+      console.log(payment);
+      // let transaction = await Transactions.create({
+      //   invoiceHeaderId: payment.dataValues.id,
+      //   number: payment.dataValues.invoice_header.id,
+      // });
+      // await Invoice_Headers.update(
+      //   {
+      //     status: "approved",
+      //   },
+      //   {
+      //     where: { id: id },
+      //   }
+      // );
+      res.status(200).send(payment);
     } catch (err) {
+      console.log(err);
       res.status(500).send(err);
     }
   },
