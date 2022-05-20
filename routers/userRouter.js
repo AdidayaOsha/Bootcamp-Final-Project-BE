@@ -21,7 +21,7 @@ router.get("/getaddresses/:id", userController.getAddressesByUserId);
 router.get("/getaddress/:id", userController.getAddressById);
 router.post("/getdefaultaddress", userController.getDefaultAddress);
 router.patch("/updatedefaultaddress", userController.updateDefaultAddress);
-router.delete("/deleteaddress/:id", userController.deleteUserAddress);
+router.post("/deleteaddress/:id", userController.deleteUserAddress);
 router.patch("/update/:id", userController.updateStatus);
 router.post("/search", userController.searchUser);
 router.patch("/recoverpassword", auth, userController.recoverPassword);
