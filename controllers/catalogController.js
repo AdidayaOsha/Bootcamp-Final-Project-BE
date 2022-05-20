@@ -6,7 +6,7 @@ const Warehouses = require("../models/Warehouses");
 
 module.exports = {
   getProducts: async (req, res) => {
-    Products.sync({ alter: true });
+    // Products.sync({ alter: true });
     try {
       let products = await Products.findAll({
         order: [["createdAt", "DESC"]],
@@ -23,7 +23,7 @@ module.exports = {
     }
   },
   getProductById: async (req, res) => {
-    Products.sync({ alter: true });
+    // Products.sync({ alter: true });
     try {
       let id = req.params.id;
       let product = await Products.findOne({
@@ -39,7 +39,7 @@ module.exports = {
     }
   },
   getProductByName: async (req, res) => {
-    Products.sync({ alter: true });
+    // Products.sync({ alter: true });
     try {
       let product = await Products.findAll({
         include: [
@@ -59,7 +59,7 @@ module.exports = {
     }
   },
   getCategories: async (req, res) => {
-    Products.sync({ alter: true });
+    // Products.sync({ alter: true });
     try {
       let categories = await Product_Categories.findAll({});
       res.status(200).send(categories);
@@ -68,7 +68,7 @@ module.exports = {
     }
   },
   getCategoryById: async (req, res) => {
-    Products.sync({ alter: true });
+    // Products.sync({ alter: true });
     try {
       let id = req.params.id;
       let product = await Products.findAll({
@@ -86,7 +86,7 @@ module.exports = {
     }
   },
   sortAZ: async (req, res) => {
-    Products.sync({ alter: true });
+    // Products.sync({ alter: true });
     try {
       let products = await Products.findAll({
         order: [["name", "ASC"]],
@@ -100,7 +100,7 @@ module.exports = {
     }
   },
   sortZA: async (req, res) => {
-    Products.sync({ alter: true });
+    // Products.sync({ alter: true });
     try {
       let products = await Products.findAll({
         order: [["name", "DESC"]],
@@ -114,7 +114,7 @@ module.exports = {
     }
   },
   highPrice: async (req, res) => {
-    Products.sync({ alter: true });
+    // Products.sync({ alter: true });
     try {
       let products = await Products.findAll({
         order: [["price", "DESC"]],
@@ -128,7 +128,7 @@ module.exports = {
     }
   },
   lowPrice: async (req, res) => {
-    Products.sync({ alter: true });
+    // Products.sync({ alter: true });
     try {
       let products = await Products.findAll({
         order: [["price", "ASC"]],

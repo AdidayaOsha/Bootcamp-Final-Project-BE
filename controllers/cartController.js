@@ -356,7 +356,12 @@ module.exports = {
         where: { id: userAddressId },
         attributes: ["latitude", "longitude", "city"],
       });
-      if (!userLocation.latitude || !userLocation.longitude) {
+      if (
+        !userLocation.latitude ||
+        userLocation.latitude === 0 ||
+        !userLocation.longitude ||
+        userLocation.longitude === 0
+      ) {
         cityLocation = await Cities.findOne({
           where: { name: userLocation.city },
           attributes: ["latitude", "longitude"],
@@ -386,7 +391,7 @@ module.exports = {
             latitude: location.latitude,
             longitude: location.longitude,
           },
-          1
+          1000
         );
         distances.push({
           id: location.id,
@@ -414,7 +419,7 @@ module.exports = {
         shipmentMasterId,
         userId,
         paymentOptionId,
-        warehouseId: warehouseDistanceId[0],
+        warehouseId: distances[0].id,
       });
 
       const invoiceDetails = await Invoice_Details.bulkCreate(
@@ -514,10 +519,23 @@ module.exports = {
       const invoiceHeader = await Invoice_Headers.findOne({
         where: { id: id },
         include: [
-          { model: User_Addresses },
+          {
+            model: User_Addresses,
+            attributes: [
+              "address_line",
+              "province",
+              "city",
+              "district",
+              "postal_code",
+            ],
+          },
           { model: Invoice_Details, include: Products },
           { model: Shipment_Masters },
           { model: Payment_Options },
+          {
+            model: Warehouses,
+            attributes: ["name", "address", "city", "province", "postal_code"],
+          },
         ],
       });
       res.status(200).send(invoiceHeader);
