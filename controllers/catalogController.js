@@ -34,6 +34,7 @@ module.exports = {
         }, });
       res.status(200).send(product);
     } catch (err) {
+      console.log(err)
       res.status(500).send(err);
     }
   },
