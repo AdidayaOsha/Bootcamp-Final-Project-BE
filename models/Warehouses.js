@@ -1,5 +1,6 @@
 const sequelize = require("../lib/sequelize");
 const { DataTypes } = require("sequelize");
+const Invoice_Details = require("./Invoice_Details");
 
 const Warehouses = sequelize.define(
   "warehouses",
@@ -43,3 +44,6 @@ const Warehouses = sequelize.define(
 );
 
 module.exports = Warehouses;
+
+Warehouses.hasOne(Invoice_Details);
+Invoice_Details.belongsTo(Warehouses);

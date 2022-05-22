@@ -7,7 +7,8 @@ router.post(
   upload_payment_proof,
   cartController.addPaymentProof
 );
-router.get("/get/:id", cartController.getUserCart);
+router.post("/get/:id", cartController.getUserCart);
+router.post("/sandboxget/:id", cartController.sandboxGetUserCart);
 router.get("/getpaymentoptions", cartController.getPaymentOptions);
 router.get("/getpaymentoption/:id", cartController.getPaymentOptionById);
 router.get("/getshipmentoptions", cartController.getShipmentOptions);
@@ -18,5 +19,6 @@ router.patch("/quantity/:id", cartController.updateCartQty);
 router.post("/add", cartController.addUserCart);
 router.post("/checkout", cartController.submitCheckout);
 router.post("/delete/:id", cartController.deleteUserCart);
+router.post("/canceltransaction", cartController.cancelTransactions);
 
 module.exports = router;

@@ -17,6 +17,7 @@ const Cities = sequelize.define(
       allownull: true,
     },
   },
+
   {
     timestamps: false,
   }

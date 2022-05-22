@@ -11,7 +11,6 @@ const Warehouse_Products = require("../models/Warehouse_Products");
 
 module.exports = {
   getPayment: async (req, res) => {
-    Payments.sync({ alter: true });
     try {
       let payment = await Payments.findAll({
         include: [
@@ -46,7 +45,6 @@ module.exports = {
     }
   },
   getPaymentSortAsc: async (req, res) => {
-    Payments.sync({ alter: true });
     try {
       let payment = await Payments.findAll({
         include: [
@@ -81,7 +79,6 @@ module.exports = {
     }
   },
   getPaymentSortDesc: async (req, res) => {
-    Payments.sync({ alter: true });
     try {
       let payment = await Payments.findAll({
         include: [
@@ -116,7 +113,6 @@ module.exports = {
     }
   },
   getPaymentById: async (req, res) => {
-    Payments.sync({ alter: true });
     try {
       let id = req.params.id;
       let payment = await Payments.findOne({
@@ -156,8 +152,6 @@ module.exports = {
     }
   },
   acceptPayment: async (req, res) => {
-    Payments.sync({ alter: true });
-    Transactions.sync({ alter: true });
     try {
       const { number } = req.body;
       let id = req.params.id;
@@ -192,26 +186,26 @@ module.exports = {
           },
         ],
       });
-      console.log(payment.dataValues.id);
-      let transaction = await Transactions.create({
-        invoiceHeaderId: payment.dataValues.id,
-        number: payment.dataValues.invoice_header.id,
-      });
-      await Invoice_Headers.update(
-        {
-          status: "approved",
-        },
-        {
-          where: { id: id },
-        }
-      );
-      res.status(200).send(transaction);
+      console.log(payment);
+      // let transaction = await Transactions.create({
+      //   invoiceHeaderId: payment.dataValues.id,
+      //   number: payment.dataValues.invoice_header.id,
+      // });
+      // await Invoice_Headers.update(
+      //   {
+      //     status: "approved",
+      //   },
+      //   {
+      //     where: { id: id },
+      //   }
+      // );
+      res.status(200).send(payment);
     } catch (err) {
+      console.log(err);
       res.status(500).send(err);
     }
   },
   rejectPayment: async (req, res) => {
-    Payments.sync({ alter: true });
     try {
       let id = req.params.id;
       let payment = await Payments.findOne({
