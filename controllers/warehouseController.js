@@ -42,6 +42,8 @@ module.exports = {
         province: req.body.province,
         postal_code: req.body.postal_code,
         phone: req.body.phone,
+        latitude: req.body.latitude,
+        longitude: req.body.longitude,
       };
       const warehouse = await Warehouses.create(data);
       res.status(200).send(warehouse);
