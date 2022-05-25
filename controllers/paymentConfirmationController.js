@@ -238,12 +238,11 @@ module.exports = {
         ],
       });
       let invoiceDetails = payment.dataValues.invoice_header.invoice_details;
-      let warehouseId = payment.dataValues.invoice_header.warehouseId;
       for (i = 0; i < invoiceDetails.length; i++) {
         let getProduct = await Warehouse_Products.findOne({
           where: {
             productId: invoiceDetails[i].productId,
-            warehouseId: warehouseId,
+            warehouseId: invoiceDetails[i].warehouseId,
           },
         });
         let stockReady = getProduct.stock_ready;
@@ -267,7 +266,7 @@ module.exports = {
           where: { id: id },
         }
       );
-      res.status(200).send(updateStatus);
+      res.status(200).send(payment);
     } catch (err) {
       res.status(500).send(err);
     }

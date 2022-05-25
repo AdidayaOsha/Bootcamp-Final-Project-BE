@@ -145,7 +145,7 @@ module.exports = {
       });
 
       let warehouseId = transactionsId.dataValues.invoice_header.warehouseId;
-      console.log(warehouseId);
+      console.log(transactionsId.dataValues.invoice_header);
 
       let warehouseInventory = await Warehouse_Products.findAll({
         where: { warehouseId: warehouseId },
@@ -247,9 +247,7 @@ module.exports = {
             currentInventoryItem = item;
           }
         });
-        console.log(item.quantity);
-        console.log(currentInventoryItem.stock_reserved);
-
+        console.log(currentInventoryItem);
         if (currentInventoryItem.stock_reserved < item.quantity) {
           console.log("Item Kurang");
           insufficientStock = true;
@@ -293,7 +291,6 @@ module.exports = {
     } catch (err) {
       res.status(err.code).send("Error Transaction: " + err.message);
     }
-    // console.log(items);
   },
   changeTransactionStatus: async (req, res) => {
     try {
