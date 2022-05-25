@@ -187,18 +187,18 @@ module.exports = {
         ],
       });
       console.log(payment);
-      // let transaction = await Transactions.create({
-      //   invoiceHeaderId: payment.dataValues.id,
-      //   number: payment.dataValues.invoice_header.id,
-      // });
-      // await Invoice_Headers.update(
-      //   {
-      //     status: "approved",
-      //   },
-      //   {
-      //     where: { id: id },
-      //   }
-      // );
+      let transaction = await Transactions.create({
+        invoiceHeaderId: payment.dataValues.id,
+        number: payment.dataValues.invoice_header.id,
+      });
+      await Invoice_Headers.update(
+        {
+          status: "approved",
+        },
+        {
+          where: { id: id },
+        }
+      );
       res.status(200).send(payment);
     } catch (err) {
       console.log(err);

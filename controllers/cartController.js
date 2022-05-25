@@ -485,7 +485,10 @@ module.exports = {
         Invoice_Details.update(
           { warehouseId: result[0] },
           {
-            where: { productId: item.productId },
+            where: {
+              productId: item.productId,
+              invoiceheaderId: invoiceHeader.id,
+            },
           }
         );
 
